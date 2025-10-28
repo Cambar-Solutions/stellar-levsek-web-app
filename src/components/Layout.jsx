@@ -1,6 +1,8 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useDebt } from '../contexts/DebtContext'
 import { Button } from './ui/Button'
+import { Badge } from './ui/Badge'
 import {
   LayoutDashboard,
   Users,
@@ -10,11 +12,13 @@ import {
   ShieldCheck,
   Menu,
   X,
+  Clock,
 } from 'lucide-react'
 import { useState } from 'react'
 
 export function Layout({ children }) {
   const { user, logout } = useAuth()
+  const { debtors } = useDebt()
   const navigate = useNavigate()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -24,9 +28,20 @@ export function Layout({ children }) {
     navigate('/login')
   }
 
+  // Contar pagos pendientes
+  const pendingPaymentsCount = debtors.reduce((count, debtor) => {
+    return count + debtor.payments.filter((p) => p.status === 'reviewing').length
+  }, 0)
+
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Deudores', href: '/debtors', icon: Users },
+    {
+      name: 'Pagos Pendientes',
+      href: '/pending-payments',
+      icon: Clock,
+      badge: pendingPaymentsCount > 0 ? pendingPaymentsCount : null
+    },
     { name: 'Estadísticas', href: '/stats', icon: BarChart3 },
     { name: 'Vista Pública', href: `/public/${user?.id}`, icon: Globe },
   ]
@@ -57,7 +72,7 @@ export function Layout({ children }) {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       isActive
                         ? 'bg-blue-50 text-blue-700'
                         : 'text-gray-600 hover:bg-gray-100'
@@ -65,6 +80,11 @@ export function Layout({ children }) {
                   >
                     <Icon size={18} />
                     {item.name}
+                    {item.badge && (
+                      <Badge variant="danger" className="ml-1 px-2 py-0 text-xs">
+                        {item.badge}
+                      </Badge>
+                    )}
                   </Link>
                 )
               })}
@@ -108,7 +128,7 @@ export function Layout({ children }) {
                     key={item.name}
                     to={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                    className={`relative flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                       isActive
                         ? 'bg-blue-50 text-blue-700'
                         : 'text-gray-600 hover:bg-gray-100'
@@ -116,6 +136,11 @@ export function Layout({ children }) {
                   >
                     <Icon size={18} />
                     {item.name}
+                    {item.badge && (
+                      <Badge variant="danger" className="ml-auto px-2 py-0 text-xs">
+                        {item.badge}
+                      </Badge>
+                    )}
                   </Link>
                 )
               })}

@@ -10,7 +10,9 @@ import { Debtors } from './pages/Debtors'
 import { AddDebtor } from './pages/AddDebtor'
 import { DebtorDetail } from './pages/DebtorDetail'
 import { Stats } from './pages/Stats'
+import { PendingPayments } from './pages/PendingPayments'
 import { PublicView } from './pages/PublicView'
+import { PublicPayment } from './pages/PublicPayment'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -90,6 +92,7 @@ function App() {
 
               {/* Public View (sin autenticación) */}
               <Route path="/public/:userId" element={<PublicView />} />
+              <Route path="/public/:userId/pay/:debtorId" element={<PublicPayment />} />
 
               {/* Protected Routes */}
               <Route
@@ -129,6 +132,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Stats />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pending-payments"
+                element={
+                  <ProtectedRoute>
+                    <PendingPayments />
                   </ProtectedRoute>
                 }
               />

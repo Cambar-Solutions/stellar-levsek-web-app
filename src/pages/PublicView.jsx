@@ -1,7 +1,8 @@
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
 import { Avatar } from '../components/ui/Avatar'
+import { Button } from '../components/ui/Button'
 import {
   ShieldCheck,
   Globe,
@@ -11,6 +12,7 @@ import {
   CheckCircle2,
   ExternalLink,
   Copy,
+  CreditCard,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -158,12 +160,15 @@ export function PublicView() {
                     <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Estado
                     </th>
+                    <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Acción
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {debtors.length === 0 ? (
                     <tr>
-                      <td colSpan="4" className="px-6 py-12 text-center text-gray-500">
+                      <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
                         No hay deudores registrados
                       </td>
                     </tr>
@@ -214,6 +219,22 @@ export function PublicView() {
                               ? 'Verificado'
                               : 'Pendiente'}
                           </Badge>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          {debtor.totalDebt > 0 ? (
+                            <Link to={`/public/${userId}/pay/${debtor.id}`}>
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                className="flex items-center gap-2 mx-auto"
+                              >
+                                <CreditCard size={16} />
+                                Pagar
+                              </Button>
+                            </Link>
+                          ) : (
+                            <span className="text-sm text-gray-400">Sin deuda</span>
+                          )}
                         </td>
                       </tr>
                     ))
