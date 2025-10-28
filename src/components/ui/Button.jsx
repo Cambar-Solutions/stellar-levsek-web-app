@@ -1,14 +1,14 @@
 import { cn } from '../../lib/utils'
 
 const buttonVariants = {
-  default: 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 shadow-sm',
-  primary: 'bg-gradient-to-br from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/30',
-  secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300',
-  success: 'bg-green-500 text-white hover:bg-green-600 active:bg-green-700 shadow-sm',
-  warning: 'bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 shadow-sm',
-  danger: 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700 shadow-sm',
-  ghost: 'bg-transparent hover:bg-gray-100 text-gray-700',
-  outline: 'border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700',
+  default: 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 shadow-sm dark:bg-blue-600 dark:hover:bg-blue-700',
+  primary: 'bg-gradient-to-br from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/30 dark:shadow-blue-500/20',
+  secondary: 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600 active:bg-gray-300 dark:active:bg-gray-500',
+  success: 'bg-green-500 text-white hover:bg-green-600 active:bg-green-700 shadow-sm dark:bg-green-600 dark:hover:bg-green-700',
+  warning: 'bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 shadow-sm dark:bg-amber-600 dark:hover:bg-amber-700',
+  danger: 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700 shadow-sm dark:bg-red-600 dark:hover:bg-red-700',
+  ghost: 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300',
+  outline: 'border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300',
 }
 
 const sizeVariants = {

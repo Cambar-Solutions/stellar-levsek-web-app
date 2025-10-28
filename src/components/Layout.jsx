@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useDebt } from '../contexts/DebtContext'
 import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
+import { ThemeToggle } from './ui/ThemeToggle'
 import {
   LayoutDashboard,
   Users,
@@ -47,9 +48,9 @@ export function Layout({ children }) {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50 backdrop-blur-lg bg-white/80">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-lg bg-white/80 dark:bg-gray-800/80 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -58,8 +59,8 @@ export function Layout({ children }) {
                 <ShieldCheck className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">ISIS</h1>
-                <p className="text-xs text-gray-500">{user?.businessName}</p>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">ISIS</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{user?.businessName}</p>
               </div>
             </div>
 
@@ -74,8 +75,8 @@ export function Layout({ children }) {
                     to={item.href}
                     className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       isActive
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
                   >
                     <Icon size={18} />
@@ -92,22 +93,23 @@ export function Layout({ children }) {
 
             {/* User Menu */}
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <div className="hidden md:block text-right">
-                <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
-                <p className="text-xs text-gray-500">{user?.email}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">{user?.name}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="hidden md:flex"
+                className="hidden md:flex dark:text-gray-300 dark:hover:bg-gray-700"
               >
                 <LogOut size={18} />
               </Button>
 
               {/* Mobile menu button */}
               <button
-                className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+                className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -118,7 +120,7 @@ export function Layout({ children }) {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white">
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <div className="px-4 py-3 space-y-1">
               {navigation.map((item) => {
                 const Icon = item.icon
@@ -130,8 +132,8 @@ export function Layout({ children }) {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`relative flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                       isActive
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
                   >
                     <Icon size={18} />
@@ -146,7 +148,7 @@ export function Layout({ children }) {
               })}
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
               >
                 <LogOut size={18} />
                 Cerrar Sesión
@@ -162,14 +164,14 @@ export function Layout({ children }) {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 mt-12 bg-white">
+      <footer className="border-t border-gray-200 dark:border-gray-700 mt-12 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               Sistema en línea • Datos actualizados en tiempo real
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
               <ShieldCheck className="w-4 h-4" />
               <span>Powered by Stellar Blockchain</span>
             </div>

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { DebtProvider } from './contexts/DebtContext'
+import { ThemeProvider } from './contexts/ThemeContext'
 import { Login } from './pages/Login'
 import { Register } from './pages/Register'
 import { Dashboard } from './pages/Dashboard'
@@ -68,9 +69,10 @@ function PublicRoute({ children }) {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <DebtProvider>
+      <ThemeProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <DebtProvider>
             <Routes>
               {/* Public Routes */}
               <Route
@@ -156,12 +158,10 @@ function App() {
               position="top-right"
               toastOptions={{
                 duration: 3000,
+                className: 'dark:bg-gray-800 dark:text-white',
                 style: {
-                  background: '#fff',
-                  color: '#1f2937',
                   padding: '16px',
                   borderRadius: '12px',
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
                   fontFamily: 'Inter, sans-serif',
                 },
                 success: {
@@ -181,6 +181,7 @@ function App() {
           </DebtProvider>
         </AuthProvider>
       </BrowserRouter>
+      </ThemeProvider>
     </QueryClientProvider>
   )
 }
