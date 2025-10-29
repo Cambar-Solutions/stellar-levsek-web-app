@@ -1,5 +1,5 @@
 // API Base URL Configuration
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4008'
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://stellar.api.levsek.com.mx'
 
 // API Endpoints
 export const API_ENDPOINTS = {
