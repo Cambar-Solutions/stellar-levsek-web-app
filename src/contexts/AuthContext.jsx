@@ -76,7 +76,6 @@ export function AuthProvider({ children }) {
       const response = await apiRegisterUser({
         name: data.name,
         email: data.email,
-        businessName: data.businessName,
         password: data.password,
       })
 

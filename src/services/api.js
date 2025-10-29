@@ -30,19 +30,25 @@ export async function apiRequest(endpoint, options = {}) {
   try {
     const response = await fetch(url, config)
 
-    // Handle 401 Unauthorized
-    if (response.status === 401) {
-      localStorage.removeItem('isis_user')
-      localStorage.removeItem('access_token')
-      // Solo redirigir si no estamos ya en login o register
-      if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
-        window.location.href = '/login'
-      }
-      throw new Error('Session expired. Please login again.')
-    }
-
     // Parse JSON response
     const data = await response.json()
+
+    // Handle 401 Unauthorized
+    if (response.status === 401) {
+      // Si estamos en login o register, es un error de credenciales, no de sesión
+      const isAuthPage = window.location.pathname.includes('/login') || window.location.pathname.includes('/register')
+
+      if (!isAuthPage) {
+        // Solo es "sesión expirada" si NO estamos en páginas de autenticación
+        localStorage.removeItem('isis_user')
+        localStorage.removeItem('access_token')
+        window.location.href = '/login'
+        throw new Error('Session expired. Please login again.')
+      } else {
+        // En páginas de auth, es un error de credenciales
+        throw new Error(data.message || 'Invalid credentials')
+      }
+    }
 
     if (!response.ok) {
       throw new Error(data.message || `HTTP error! status: ${response.status}`)

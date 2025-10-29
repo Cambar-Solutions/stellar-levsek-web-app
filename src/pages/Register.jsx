@@ -12,7 +12,6 @@ export function Register() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    businessName: '',
     password: '',
     confirmPassword: '',
   })
@@ -24,9 +23,8 @@ export function Register() {
 
     if (!formData.name) newErrors.name = 'El nombre es requerido'
     if (!formData.email) newErrors.email = 'El correo es requerido'
-    if (!formData.businessName) newErrors.businessName = 'El nombre del negocio es requerido'
     if (!formData.password) newErrors.password = 'La contraseña es requerida'
-    if (formData.password.length < 6) newErrors.password = 'La contraseña debe tener al menos 6 caracteres'
+    if (formData.password.length < 8) newErrors.password = 'La contraseña debe tener al menos 8 caracteres'
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Las contraseñas no coinciden'
     }
@@ -69,11 +67,11 @@ export function Register() {
             </div>
 
             <h1 className="text-5xl font-bold leading-tight">
-              Crea tu cuenta de negocio
+              Crea tu cuenta
             </h1>
 
             <p className="text-xl text-purple-100">
-              Comienza a gestionar las deudas de tu negocio con transparencia blockchain
+              Comienza a gestionar deudas con transparencia blockchain
             </p>
           </div>
 
@@ -97,7 +95,7 @@ export function Register() {
                 <Building2 className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-3xl font-bold text-gray-900">Crear Cuenta</h2>
-              <p className="text-gray-600 mt-2">Registra tu negocio en ISIS</p>
+              <p className="text-gray-600 mt-2">Regístrate en ISIS</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -122,18 +120,6 @@ export function Register() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   error={errors.email}
-                />
-              </div>
-
-              <div>
-                <Label required>Nombre del negocio</Label>
-                <Input
-                  type="text"
-                  placeholder="Mi Negocio S.A."
-                  icon={Building2}
-                  value={formData.businessName}
-                  onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                  error={errors.businessName}
                 />
               </div>
 
