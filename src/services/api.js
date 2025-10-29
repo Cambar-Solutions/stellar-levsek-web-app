@@ -97,3 +97,31 @@ export function apiDelete(endpoint) {
     method: 'DELETE',
   })
 }
+
+/**
+ * Public GET request (no authentication required)
+ */
+export async function apiPublicGet(endpoint) {
+  const url = `${API_BASE_URL}${endpoint}`
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(data.message || `HTTP error! status: ${response.status}`)
+    }
+
+    return data
+  } catch (error) {
+    console.error('Public API Request Error:', error)
+    throw error
+  }
+}

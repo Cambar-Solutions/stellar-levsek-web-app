@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPatch, apiDelete } from './api'
+import { apiGet, apiPost, apiPatch, apiDelete, apiPublicGet } from './api'
 import { API_ENDPOINTS } from '../constants/api'
 
 /**
@@ -97,4 +97,11 @@ export async function updateCustomer(id, updates) {
  */
 export async function deleteCustomer(id) {
   return await apiDelete(API_ENDPOINTS.CUSTOMER_BY_ID(id))
+}
+
+/**
+ * Get public site information (no authentication)
+ */
+export async function getPublicSiteInfo(siteId) {
+  return await apiPublicGet(`/sites/public/${siteId}`)
 }

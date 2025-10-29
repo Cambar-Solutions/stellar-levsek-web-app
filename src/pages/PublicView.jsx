@@ -16,35 +16,33 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { getPublicSiteInfo } from '../services/debtService'
 
 export function PublicView() {
-  const { userId: userIdParam } = useParams()
+  const { siteId } = useParams()
   const [businessData, setBusinessData] = useState(null)
   const [debtors, setDebtors] = useState([])
-
-  // Convert userId from URL params to number for comparison
-  const userId = Number(userIdParam)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Cargar datos del negocio y deudores desde localStorage
-    const users = []
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key.startsWith('isis_user_')) {
-        const userData = JSON.parse(localStorage.getItem(key))
-        if (userData.id === userId) {
-          setBusinessData(userData)
+    loadPublicData()
+  }, [siteId])
 
-          // Cargar deudores
-          const debtorsData = localStorage.getItem(`isis_debtors_${userId}`)
-          if (debtorsData) {
-            setDebtors(JSON.parse(debtorsData))
-          }
-          break
-        }
-      }
+  const loadPublicData = async () => {
+    try {
+      setLoading(true)
+      const response = await getPublicSiteInfo(siteId)
+      const data = response.data || response
+
+      setBusinessData(data.site)
+      setDebtors(data.debtors || [])
+    } catch (error) {
+      console.error('Error loading public data:', error)
+      toast.error('Error al cargar información pública')
+    } finally {
+      setLoading(false)
     }
-  }, [userId])
+  }
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('es-MX', {
@@ -58,9 +56,20 @@ export function PublicView() {
     toast.success('Copiado al portapapeles')
   }
 
-  const totalDebt = debtors.reduce((sum, d) => sum + d.totalDebt, 0)
-  const pendingCount = debtors.filter((d) => d.status === 'pending').length
-  const verifiedCount = debtors.filter((d) => d.status === 'verified').length
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardContent className="p-12 text-center">
+            <Globe className="w-16 h-16 text-gray-400 mx-auto mb-4 animate-spin" />
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
+              Cargando...
+            </h2>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   if (!businessData) {
     return (
@@ -92,7 +101,7 @@ export function PublicView() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {businessData.businessName}
+                  {businessData.name}
                 </h1>
                 <div className="flex items-center gap-2 mt-1">
                   <Globe className="w-4 h-4 text-green-600" />
@@ -118,7 +127,7 @@ export function PublicView() {
                 <h2 className="text-2xl font-bold mb-2">Transparencia Blockchain</h2>
                 <p className="text-blue-100 text-lg">
                   Este es un registro público y verificable de las deudas de{' '}
-                  {businessData.businessName}. Todos los datos están respaldados por
+                  {businessData.name}. Todos los datos están respaldados por
                   la red Stellar blockchain, garantizando inmutabilidad y transparencia.
                 </p>
               </div>
@@ -225,7 +234,7 @@ export function PublicView() {
                         </td>
                         <td className="px-6 py-4 text-center">
                           {debtor.totalDebt > 0 ? (
-                            <Link to={`/public/${userId}/pay/${debtor.id}`}>
+                            <Link to={`/public/${siteId}/pay/${debtor.id}`}>
                               <Button
                                 variant="primary"
                                 size="sm"
@@ -257,32 +266,5 @@ export function PublicView() {
         </div>
       </div>
     </div>
-  )
-}
-
-function StatsCard({ title, value, icon, color }) {
-  const colorClasses = {
-    blue: 'from-blue-500 to-blue-600',
-    purple: 'from-purple-500 to-purple-600',
-    orange: 'from-orange-500 to-orange-600',
-    green: 'from-green-500 to-green-600',
-  }
-
-  return (
-    <Card className="hover:shadow-lg transition-shadow">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-            <p className="text-2xl font-bold text-gray-900">{value}</p>
-          </div>
-          <div
-            className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colorClasses[color]} flex items-center justify-center text-white shadow-lg`}
-          >
-            {icon}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   )
 }
