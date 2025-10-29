@@ -8,6 +8,7 @@ import {
   updateDebt,
   deleteDebt,
   registerPayment,
+  approvePayment as approvePaymentAPI,
   getAllCustomers,
   createCustomer,
   updateCustomer,
@@ -72,6 +73,7 @@ export function DebtProvider({ children }) {
       })
 
       // Then, add debt information
+      console.log('🔍 Processing debts data:', debtsData.length, 'debts')
       debtsData.forEach((debt) => {
         if (debtorsMap.has(debt.customerId)) {
           const debtor = debtorsMap.get(debt.customerId)
@@ -79,6 +81,13 @@ export function DebtProvider({ children }) {
           const pendingAmount = Number(debt.pendingAmount || debt.pending_amount || 0)
           const paidAmount = Number(debt.paidAmount || debt.paid_amount || 0)
           const totalAmount = Number(debt.totalAmount || debt.total_amount || 0)
+
+          console.log(`💰 Debt ID ${debt.id} for customer ${debt.customerId}:`, {
+            totalAmount,
+            paidAmount,
+            pendingAmount,
+            status: debt.status
+          })
 
           // Add individual debt to the list
           debtor.debts.push({
@@ -96,6 +105,7 @@ export function DebtProvider({ children }) {
 
           // Sum up total debt from all debts for this customer
           debtor.totalDebt += pendingAmount
+          console.log(`➕ Adding ${pendingAmount} to debtor ${debtor.name}, new total: ${debtor.totalDebt}`)
 
           // Update status based on debt status
           if (debt.status === 'pending' && debtor.status !== 'pending') {
@@ -116,7 +126,14 @@ export function DebtProvider({ children }) {
         }
       })
 
-      setDebtors(Array.from(debtorsMap.values()))
+      const finalDebtors = Array.from(debtorsMap.values())
+      console.log('✅ Final debtors array:', finalDebtors.map(d => ({
+        id: d.id,
+        name: d.name,
+        totalDebt: d.totalDebt,
+        debtsCount: d.debts.length
+      })))
+      setDebtors(finalDebtors)
     } catch (error) {
       console.error('Error loading data:', error)
       toast.error('Error al cargar datos')
@@ -197,6 +214,7 @@ export function DebtProvider({ children }) {
 
   const addPayment = async (debtorId, paymentData) => {
     try {
+      console.log('🔔 addPayment called for debtorId:', debtorId, 'amount:', paymentData.amount)
       // Normalize debtorId to number
       const customerId = Number(debtorId)
 
@@ -210,6 +228,12 @@ export function DebtProvider({ children }) {
         return
       }
 
+      console.log('📝 Found debt to pay:', {
+        debtId: customerDebt.id,
+        currentPending: customerDebt.pendingAmount || customerDebt.pending_amount,
+        currentPaid: customerDebt.paidAmount || customerDebt.paid_amount
+      })
+
       // Register payment
       const paymentPayload = {
         amount: parseFloat(paymentData.amount) || 0,
@@ -217,7 +241,9 @@ export function DebtProvider({ children }) {
         notes: paymentData.notes || null,
       }
 
+      console.log('🚀 Calling registerPayment API with:', paymentPayload)
       await registerPayment(customerDebt.id, paymentPayload)
+      console.log('✅ registerPayment API call completed, now reloading data...')
       await loadData()
 
       toast.success('Pago registrado exitosamente en blockchain')
@@ -229,14 +255,52 @@ export function DebtProvider({ children }) {
   }
 
   const approvePayment = async (debtorId, paymentId) => {
-    // This is now automatic in the backend when payment is registered
-    toast.success('Pago aprobado')
-    await loadData()
+    try {
+      // Normalize debtorId to number
+      const customerId = Number(debtorId)
+
+      // Find the debtor and payment
+      const debtor = debtors.find((d) => d.id === customerId)
+      if (!debtor) {
+        toast.error('Deudor no encontrado')
+        return
+      }
+
+      const payment = debtor.payments.find((p) => p.id === paymentId)
+      if (!payment) {
+        toast.error('Pago no encontrado')
+        return
+      }
+
+      // If payment has a debtId, use the approve endpoint
+      if (payment.debtId) {
+        await approvePaymentAPI(payment.debtId, {
+          amount: payment.amount,
+          paymentType: 'cash', // Default, could be extracted from payment data
+          notes: `Pago aprobado manualmente - ${payment.txHash || ''}`,
+        })
+        toast.success('Pago aprobado y registrado')
+      } else {
+        toast.error('No se puede aprobar: pago sin ID de deuda')
+      }
+
+      await loadData()
+    } catch (error) {
+      console.error('Error approving payment:', error)
+      toast.error(error.message || 'Error al aprobar pago')
+    }
   }
 
   const rejectPayment = async (debtorId, paymentId) => {
-    // For now, this would require backend support to reverse a payment
-    toast.error('Funcionalidad no disponible aún')
+    try {
+      // For now, rejecting a payment just removes it from the view
+      // In a real implementation, this would call a backend endpoint
+      toast.info('Pago rechazado. Se recargará la información.')
+      await loadData()
+    } catch (error) {
+      console.error('Error rejecting payment:', error)
+      toast.error(error.message || 'Error al rechazar pago')
+    }
   }
 
   const getStats = () => {

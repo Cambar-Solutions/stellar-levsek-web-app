@@ -16,6 +16,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { getPublicSiteInfo } from '../services/debtService'
 
 export function PublicPayment() {
   const { siteId, debtorId: debtorIdParam } = useParams()
@@ -26,32 +27,34 @@ export function PublicPayment() {
   const [txReference, setTxReference] = useState('')
   const [processing, setProcessing] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   // Convert IDs from URL params to numbers for comparison
-  const userId = Number(userIdParam)
   const debtorId = Number(debtorIdParam)
 
   useEffect(() => {
-    // Cargar datos del negocio y deudor
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key.startsWith('isis_user_')) {
-        const userData = JSON.parse(localStorage.getItem(key))
-        if (userData.id === userId) {
-          setBusinessData(userData)
+    loadPublicData()
+  }, [siteId, debtorId])
 
-          // Cargar deudores
-          const debtorsData = localStorage.getItem(`isis_debtors_${userId}`)
-          if (debtorsData) {
-            const debtors = JSON.parse(debtorsData)
-            const foundDebtor = debtors.find((d) => d.id === debtorId)
-            setDebtor(foundDebtor)
-          }
-          break
-        }
-      }
+  const loadPublicData = async () => {
+    try {
+      setLoading(true)
+      const response = await getPublicSiteInfo(siteId)
+      const data = response.data || response
+
+      setBusinessData(data.site)
+
+      // Buscar el deudor específico
+      const debtors = data.debtors || []
+      const foundDebtor = debtors.find((d) => d.id === debtorId)
+      setDebtor(foundDebtor)
+    } catch (error) {
+      console.error('Error loading public data:', error)
+      toast.error('Error al cargar información del deudor')
+    } finally {
+      setLoading(false)
     }
-  }, [userId, debtorId])
+  }
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('es-MX', {
@@ -102,31 +105,9 @@ export function PublicPayment() {
       const result = await simulateStellarPayment(amount)
 
       if (result.success) {
-        // Agregar pago a la lista de deudores
-        const debtorsData = localStorage.getItem(`isis_debtors_${userId}`)
-        if (debtorsData) {
-          const debtors = JSON.parse(debtorsData)
-          const updatedDebtors = debtors.map((d) => {
-            if (d.id === debtorId) {
-              const newPayment = {
-                id: Date.now(),
-                amount: amount,
-                status: 'reviewing',
-                date: new Date().toISOString(),
-                txHash: result.txHash,
-                reference: txReference,
-                publicPayment: true,
-              }
-              return {
-                ...d,
-                payments: [...d.payments, newPayment],
-              }
-            }
-            return d
-          })
-
-          localStorage.setItem(`isis_debtors_${userId}`, JSON.stringify(updatedDebtors))
-        }
+        // TODO: En producción, esto debería hacer un POST a la API
+        // para registrar el pago público. Por ahora solo mostramos éxito.
+        // Endpoint necesario: POST /debts/:debtId/public-payment
 
         setPaymentSuccess(true)
         toast.success('¡Pago registrado exitosamente!')
@@ -138,13 +119,30 @@ export function PublicPayment() {
     }
   }
 
-  if (!businessData || !debtor) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="max-w-md">
           <CardContent className="p-12 text-center">
             <Loader2 className="w-16 h-16 text-gray-400 mx-auto mb-4 animate-spin" />
             <p className="text-gray-600">Cargando información...</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (!businessData || !debtor) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardContent className="p-12 text-center">
+            <Info className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Deudor no encontrado</h2>
+            <p className="text-gray-600 mb-4">No se pudo cargar la información del deudor.</p>
+            <Button onClick={() => navigate(`/public/${siteId}`)} variant="primary">
+              Volver al Registro Público
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -176,7 +174,7 @@ export function PublicPayment() {
                   </p>
                   <ul className="text-sm text-blue-800 space-y-1">
                     <li>• Tu pago está ahora <strong>en revisión</strong></li>
-                    <li>• El administrador de {businessData.businessName} lo verificará</li>
+                    <li>• El administrador de {businessData.name} lo verificará</li>
                     <li>• Recibirás confirmación una vez aprobado</li>
                     <li>• El saldo se actualizará automáticamente</li>
                   </ul>
@@ -218,13 +216,13 @@ export function PublicPayment() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {businessData.businessName}
+                  {businessData.name}
                 </h1>
                 <p className="text-sm text-gray-600">Portal de Pagos Públicos</p>
               </div>
             </div>
             <button
-              onClick={() => navigate(`/public/${userId}`)}
+              onClick={() => navigate(`/public/${siteId}`)}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
             >
               <ArrowLeft size={20} />

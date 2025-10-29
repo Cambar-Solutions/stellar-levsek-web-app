@@ -58,6 +58,13 @@ export async function registerPayment(debtId, paymentData) {
 }
 
 /**
+ * Approve a pending payment
+ */
+export async function approvePayment(debtId, paymentData) {
+  return await apiPatch(`/debts/${debtId}/approve-payment`, paymentData)
+}
+
+/**
  * Get all customers
  */
 export async function getAllCustomers() {
