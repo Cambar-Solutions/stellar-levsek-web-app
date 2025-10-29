@@ -2,13 +2,15 @@ import { apiPost, apiGet } from './api'
 import { API_ENDPOINTS } from '../constants/api'
 
 /**
- * Login user
+ * Login user with JWT
  */
 export async function loginUser(email, password) {
   const response = await apiPost(API_ENDPOINTS.LOGIN, { email, password })
 
-  // El backend ahora usa cookies para la sesión, no devuelve access_token
-  // La cookie se guarda automáticamente por el navegador
+  // Save JWT token to localStorage
+  if (response.access_token) {
+    localStorage.setItem('access_token', response.access_token)
+  }
 
   return response
 }
@@ -25,8 +27,9 @@ export async function validateSession() {
  */
 export async function logoutUser() {
   const response = await apiPost(API_ENDPOINTS.LOGOUT)
-  // La cookie de sesión se elimina en el backend
+  // Remove token from localStorage
   localStorage.removeItem('isis_user')
+  localStorage.removeItem('access_token')
   return response
 }
 

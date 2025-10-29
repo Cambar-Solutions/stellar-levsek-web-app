@@ -22,8 +22,15 @@ export function AuthProvider({ children }) {
 
   const checkAuth = async () => {
     try {
-      // El backend ahora usa cookies, no tokens en localStorage
-      // Intentamos validar la sesión directamente
+      // Check if token exists in localStorage
+      const token = localStorage.getItem('access_token')
+
+      if (!token) {
+        setLoading(false)
+        return
+      }
+
+      // Validate the token with the backend
       const response = await validateSession()
       const userData = response.data || response
 
@@ -34,6 +41,7 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.error('Auth validation failed:', error)
       localStorage.removeItem('isis_user')
+      localStorage.removeItem('access_token')
     } finally {
       setLoading(false)
     }

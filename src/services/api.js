@@ -1,7 +1,7 @@
 import { API_BASE_URL } from '../constants/api'
 
 /**
- * Base API request handler with authentication
+ * Base API request handler with JWT authentication
  */
 export async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`
@@ -11,8 +11,13 @@ export async function apiRequest(endpoint, options = {}) {
     'Accept': 'application/json',
   }
 
-  // El backend ahora usa cookies de sesión en lugar de JWT tokens
-  // No necesitamos enviar Authorization header
+  // Get JWT token from localStorage
+  const token = localStorage.getItem('access_token')
+
+  // Add Authorization header if token exists
+  if (token) {
+    defaultHeaders['Authorization'] = `Bearer ${token}`
+  }
 
   const config = {
     ...options,
@@ -20,7 +25,6 @@ export async function apiRequest(endpoint, options = {}) {
       ...defaultHeaders,
       ...options.headers,
     },
-    credentials: 'include', // Important for cookies
   }
 
   try {
@@ -29,6 +33,7 @@ export async function apiRequest(endpoint, options = {}) {
     // Handle 401 Unauthorized
     if (response.status === 401) {
       localStorage.removeItem('isis_user')
+      localStorage.removeItem('access_token')
       // Solo redirigir si no estamos ya en login o register
       if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
         window.location.href = '/login'
