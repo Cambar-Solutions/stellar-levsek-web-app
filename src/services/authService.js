@@ -6,10 +6,19 @@ import { API_ENDPOINTS } from '../constants/api'
  */
 export async function loginUser(email, password) {
   const response = await apiPost(API_ENDPOINTS.LOGIN, { email, password })
+  console.log('🔑 authService - Full login response:', response)
+  console.log('🔑 authService - response.access_token:', response.access_token)
+  console.log('🔑 authService - response.data?.access_token:', response.data?.access_token)
 
   // Save JWT token to localStorage
-  if (response.access_token) {
-    localStorage.setItem('access_token', response.access_token)
+  const token = response.access_token || response.data?.access_token
+  console.log('🔑 authService - Token to save:', token)
+
+  if (token) {
+    localStorage.setItem('access_token', token)
+    console.log('✅ Token saved to localStorage')
+  } else {
+    console.error('❌ No token found in response!')
   }
 
   return response

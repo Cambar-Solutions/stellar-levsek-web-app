@@ -24,22 +24,36 @@ export function AuthProvider({ children }) {
     try {
       // Check if token exists in localStorage
       const token = localStorage.getItem('access_token')
+      console.log('🔍 CheckAuth - Token found:', !!token)
 
       if (!token) {
+        console.log('❌ No token found, clearing session')
+        setUser(null)
         setLoading(false)
         return
       }
 
       // Validate the token with the backend
+      console.log('🔄 Validating session with backend...')
       const response = await validateSession()
+      console.log('✅ Validation response:', response)
       const userData = response.data || response
 
       if (userData && userData.user) {
+        console.log('👤 User data found:', userData.user)
         setUser(userData.user)
         localStorage.setItem('isis_user', JSON.stringify(userData.user))
+      } else {
+        // Si no hay datos de usuario en la respuesta, limpiar sesión
+        console.log('⚠️ No user data in response, clearing session')
+        setUser(null)
+        localStorage.removeItem('isis_user')
+        localStorage.removeItem('access_token')
       }
     } catch (error) {
-      console.error('Auth validation failed:', error)
+      console.error('❌ Auth validation failed:', error)
+      // Limpiar sesión y estado cuando falla la validación
+      setUser(null)
       localStorage.removeItem('isis_user')
       localStorage.removeItem('access_token')
     } finally {
@@ -49,22 +63,30 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
+      console.log('🔐 Attempting login...')
       const response = await apiLoginUser(email, password)
+      console.log('📥 Login response:', response)
 
       // El backend puede devolver { data: { user, message } } o directamente { user, message }
       const loginData = response.data || response
 
+      // Verificar si hay token guardado
+      const token = localStorage.getItem('access_token')
+      console.log('🎫 Token saved after login:', !!token)
+
       if (loginData.user) {
+        console.log('✅ Login successful, setting user:', loginData.user)
         setUser(loginData.user)
         localStorage.setItem('isis_user', JSON.stringify(loginData.user))
         toast.success('¡Bienvenido de nuevo!')
         return { success: true }
       }
 
+      console.log('⚠️ No user data in login response')
       toast.error('Credenciales incorrectas')
       return { success: false, error: 'Credenciales incorrectas' }
     } catch (error) {
-      console.error('Login error:', error)
+      console.error('❌ Login error:', error)
       toast.error(error.message || 'Error al iniciar sesión')
       return { success: false, error: error.message }
     }
