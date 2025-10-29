@@ -243,6 +243,95 @@ export function DebtorDetail() {
           </Card>
         )}
 
+        {/* Debts Breakdown */}
+        {debtor.debts && debtor.debts.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <h3 className="text-lg font-bold text-gray-900">Desglose de Deudas</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {debtor.debts.length} {debtor.debts.length === 1 ? 'deuda registrada' : 'deudas registradas'}
+              </p>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="divide-y divide-gray-200">
+                {debtor.debts.map((debt) => (
+                  <div
+                    key={debt.id}
+                    className="p-6 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h4 className="font-semibold text-gray-900">
+                            {debt.description || 'Sin descripción'}
+                          </h4>
+                          <Badge
+                            variant={
+                              debt.status === 'paid'
+                                ? 'verified'
+                                : debt.status === 'partial'
+                                ? 'warning'
+                                : debt.status === 'pending'
+                                ? 'pending'
+                                : 'default'
+                            }
+                          >
+                            {debt.status === 'paid'
+                              ? 'Pagada'
+                              : debt.status === 'partial'
+                              ? 'Parcial'
+                              : debt.status === 'pending'
+                              ? 'Pendiente'
+                              : debt.status}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-500 mb-3">
+                          Registrada el {formatDate(debt.createdAt)}
+                        </p>
+
+                        <div className="grid grid-cols-3 gap-4 mt-3">
+                          <div className="bg-blue-50 rounded-lg p-3">
+                            <p className="text-xs text-gray-600 mb-1">Monto Total</p>
+                            <p className="text-lg font-bold text-blue-600">
+                              {formatCurrency(debt.totalAmount)}
+                            </p>
+                          </div>
+                          <div className="bg-green-50 rounded-lg p-3">
+                            <p className="text-xs text-gray-600 mb-1">Pagado</p>
+                            <p className="text-lg font-bold text-green-600">
+                              {formatCurrency(debt.paidAmount)}
+                            </p>
+                          </div>
+                          <div className="bg-orange-50 rounded-lg p-3">
+                            <p className="text-xs text-gray-600 mb-1">Pendiente</p>
+                            <p className="text-lg font-bold text-orange-600">
+                              {formatCurrency(debt.pendingAmount)}
+                            </p>
+                          </div>
+                        </div>
+
+                        {debt.stellarTxHash && (
+                          <div className="mt-3 flex items-center gap-2">
+                            <code className="text-xs text-gray-500 font-mono">
+                              TX: {debt.stellarTxHash.substring(0, 16)}...
+                            </code>
+                            <button
+                              onClick={() => copyToClipboard(debt.stellarTxHash)}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              <Copy size={14} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Payment History */}
         <Card>
           <CardHeader>

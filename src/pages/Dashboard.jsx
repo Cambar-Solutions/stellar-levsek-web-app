@@ -103,7 +103,7 @@ export function Dashboard() {
                 </button>
               </div>
             </div>
-            <Link to={`/public/${user?.id}`}>
+            <Link to={`/public/${user?.siteId}`}>
               <Button variant="secondary" size="sm" className="flex items-center gap-2">
                 <ExternalLink size={16} />
                 Ver Vista Pública

@@ -18,7 +18,7 @@ import {
 import toast from 'react-hot-toast'
 
 export function PublicPayment() {
-  const { userId: userIdParam, debtorId: debtorIdParam } = useParams()
+  const { siteId, debtorId: debtorIdParam } = useParams()
   const navigate = useNavigate()
   const [businessData, setBusinessData] = useState(null)
   const [debtor, setDebtor] = useState(null)
@@ -187,7 +187,7 @@ export function PublicPayment() {
             <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 variant="ghost"
-                onClick={() => navigate(`/public/${userId}`)}
+                onClick={() => navigate(`/public/${siteId}`)}
                 className="flex-1"
               >
                 Ver Registro Público

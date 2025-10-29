@@ -93,8 +93,8 @@ function App() {
               />
 
               {/* Public View (sin autenticación) */}
-              <Route path="/public/:userId" element={<PublicView />} />
-              <Route path="/public/:userId/pay/:debtorId" element={<PublicPayment />} />
+              <Route path="/public/:siteId" element={<PublicView />} />
+              <Route path="/public/:siteId/pay/:debtorId" element={<PublicPayment />} />
 
               {/* Protected Routes */}
               <Route

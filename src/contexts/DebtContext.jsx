@@ -53,18 +53,20 @@ export function DebtProvider({ children }) {
 
       // First, create debtors from customers
       customersData.forEach((customer) => {
+        const stellarKey = customer.stellarPublicKey || customer.stellar_public_key
         debtorsMap.set(customer.id, {
           id: customer.id,
-          name: `${customer.name} ${customer.last_name}`,
+          name: `${customer.name} ${customer.lastName || customer.last_name || ''}`.trim(),
           email: customer.email,
-          phone: customer.phone_number,
+          phone: customer.phoneNumber || customer.phone_number,
           totalDebt: 0,
           status: 'verified', // Default
-          accountType: customer.stellar_public_key
-            ? `Cuenta ${customer.stellar_public_key.substring(0, 8)}... • Blockchain`
+          accountType: stellarKey
+            ? `Cuenta ${stellarKey.substring(0, 8)}... • Blockchain`
             : 'Cuenta Local',
-          walletAddress: customer.stellar_public_key || null,
-          createdAt: customer.created_at || customer.createdAt,
+          walletAddress: stellarKey || null,
+          createdAt: customer.createdAt || customer.created_at,
+          debts: [], // Lista de deudas individuales
           payments: [],
         })
       })
@@ -74,8 +76,26 @@ export function DebtProvider({ children }) {
         if (debtorsMap.has(debt.customerId)) {
           const debtor = debtorsMap.get(debt.customerId)
 
+          const pendingAmount = Number(debt.pendingAmount || debt.pending_amount || 0)
+          const paidAmount = Number(debt.paidAmount || debt.paid_amount || 0)
+          const totalAmount = Number(debt.totalAmount || debt.total_amount || 0)
+
+          // Add individual debt to the list
+          debtor.debts.push({
+            id: debt.id,
+            totalAmount: totalAmount,
+            paidAmount: paidAmount,
+            pendingAmount: pendingAmount,
+            description: debt.description,
+            status: debt.status,
+            createdAt: debt.createdAt || debt.created_at,
+            updatedAt: debt.updatedAt || debt.updated_at,
+            stellarTxHash: debt.stellarTxHash || debt.stellar_tx_hash || null,
+            paymentType: debt.paymentType || debt.payment_type || null,
+          })
+
           // Sum up total debt from all debts for this customer
-          debtor.totalDebt += Number(debt.pending_amount || 0)
+          debtor.totalDebt += pendingAmount
 
           // Update status based on debt status
           if (debt.status === 'pending' && debtor.status !== 'pending') {
@@ -83,13 +103,13 @@ export function DebtProvider({ children }) {
           }
 
           // Add payment info if exists
-          if (debt.paid_amount > 0) {
+          if (paidAmount > 0) {
             debtor.payments.push({
               id: `payment_${debt.id}`,
-              amount: Number(debt.paid_amount),
-              date: debt.updated_at || debt.updatedAt,
+              amount: paidAmount,
+              date: debt.updatedAt || debt.updated_at,
               status: debt.status === 'paid' ? 'verified' : 'reviewing',
-              txHash: debt.stellar_tx_hash || null,
+              txHash: debt.stellarTxHash || debt.stellar_tx_hash || null,
               debtId: debt.id,
             })
           }
@@ -129,7 +149,7 @@ export function DebtProvider({ children }) {
         description: debtorData.description || 'Deuda inicial',
       }
 
-      const newDebt = await createDebt(debtData)
+      await createDebt(debtData)
 
       // Reload data to get updated list
       await loadData()

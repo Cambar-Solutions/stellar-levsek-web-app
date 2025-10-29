@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Read(//c/ERICK/Levsek/Proyectos/elreydelaarrachera/front/elrey-web-app/**)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Read(//c/ERICK/Levsek/Hackathon/service-stellar/**)",
+      "Bash(bun run start:dev:*)"
     ],
     "deny": [],
     "ask": []

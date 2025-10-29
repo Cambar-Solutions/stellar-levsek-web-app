@@ -44,7 +44,7 @@ export function Layout({ children }) {
       badge: pendingPaymentsCount > 0 ? pendingPaymentsCount : null
     },
     { name: 'Estadísticas', href: '/stats', icon: BarChart3 },
-    { name: 'Vista Pública', href: `/public/${user?.id}`, icon: Globe },
+    { name: 'Vista Pública', href: `/public/${user?.siteId}`, icon: Globe },
   ]
 
   return (
