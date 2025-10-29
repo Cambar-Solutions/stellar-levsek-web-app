@@ -18,9 +18,12 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 export function PublicView() {
-  const { userId } = useParams()
+  const { userId: userIdParam } = useParams()
   const [businessData, setBusinessData] = useState(null)
   const [debtors, setDebtors] = useState([])
+
+  // Convert userId from URL params to number for comparison
+  const userId = Number(userIdParam)
 
   useEffect(() => {
     // Cargar datos del negocio y deudores desde localStorage

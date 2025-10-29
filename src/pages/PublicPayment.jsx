@@ -18,7 +18,7 @@ import {
 import toast from 'react-hot-toast'
 
 export function PublicPayment() {
-  const { userId, debtorId } = useParams()
+  const { userId: userIdParam, debtorId: debtorIdParam } = useParams()
   const navigate = useNavigate()
   const [businessData, setBusinessData] = useState(null)
   const [debtor, setDebtor] = useState(null)
@@ -26,6 +26,10 @@ export function PublicPayment() {
   const [txReference, setTxReference] = useState('')
   const [processing, setProcessing] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState(false)
+
+  // Convert IDs from URL params to numbers for comparison
+  const userId = Number(userIdParam)
+  const debtorId = Number(debtorIdParam)
 
   useEffect(() => {
     // Cargar datos del negocio y deudor
@@ -105,7 +109,7 @@ export function PublicPayment() {
           const updatedDebtors = debtors.map((d) => {
             if (d.id === debtorId) {
               const newPayment = {
-                id: `p${Date.now()}`,
+                id: Date.now(),
                 amount: amount,
                 status: 'reviewing',
                 date: new Date().toISOString(),

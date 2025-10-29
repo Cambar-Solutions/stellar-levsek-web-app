@@ -1,201 +1,219 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { useAuth } from './AuthContext'
 import toast from 'react-hot-toast'
+import {
+  getAllDebts,
+  getDebtsBySite,
+  createDebt,
+  updateDebt,
+  deleteDebt,
+  registerPayment,
+  getAllCustomers,
+  createCustomer,
+  updateCustomer,
+  deleteCustomer,
+} from '../services/debtService'
 
 const DebtContext = createContext(null)
 
 export function DebtProvider({ children }) {
   const { user } = useAuth()
   const [debtors, setDebtors] = useState([])
+  const [customers, setCustomers] = useState([])
+  const [debts, setDebts] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (user) {
-      loadDebtors()
+      loadData()
     }
   }, [user])
 
-  const loadDebtors = () => {
+  const loadData = async () => {
     if (!user) return
 
-    const savedDebtors = localStorage.getItem(`isis_debtors_${user.id}`)
-    if (savedDebtors) {
-      setDebtors(JSON.parse(savedDebtors))
-    } else {
-      // Datos de ejemplo para el demo
-      const sampleDebtors = [
-        {
-          id: '1',
-          name: 'Carlos Martínez',
-          email: 'carlos@email.com',
-          phone: '+52 555 123 4567',
-          totalDebt: 5800,
-          status: 'pending',
-          accountType: 'Cuenta SBN4532 • Negocio Activo',
-          walletAddress: 'GDHX...KL9P',
-          createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-          payments: [
-            {
-              id: 'p1',
-              amount: 1200,
-              date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-              status: 'verified',
-              txHash: 'a1b2c3d4e5f6',
-            },
-          ],
-        },
-        {
-          id: '2',
-          name: 'María González',
-          email: 'maria@email.com',
-          phone: '+52 555 234 5678',
-          totalDebt: 5000,
-          status: 'pending',
-          accountType: 'Cuenta SBN8821 • Negocio Activo',
-          walletAddress: 'GBJK...MN3Q',
-          createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
+    try {
+      setLoading(true)
+
+      // Load customers and debts from API
+      const [customersData, debtsData] = await Promise.all([
+        getAllCustomers(),
+        getAllDebts(),
+      ])
+
+      setCustomers(customersData)
+      setDebts(debtsData)
+
+      // Transform data to match frontend format (debtors with combined debt info)
+      const debtorsMap = new Map()
+
+      // First, create debtors from customers
+      customersData.forEach((customer) => {
+        debtorsMap.set(customer.id, {
+          id: customer.id,
+          name: `${customer.name} ${customer.last_name}`,
+          email: customer.email,
+          phone: customer.phone_number,
+          totalDebt: 0,
+          status: 'verified', // Default
+          accountType: customer.stellar_public_key
+            ? `Cuenta ${customer.stellar_public_key.substring(0, 8)}... • Blockchain`
+            : 'Cuenta Local',
+          walletAddress: customer.stellar_public_key || null,
+          createdAt: customer.created_at || customer.createdAt,
           payments: [],
-        },
-        {
-          id: '3',
-          name: 'Roberto Sánchez',
-          email: 'roberto@email.com',
-          phone: '+52 555 345 6789',
-          totalDebt: 3000,
-          status: 'pending',
-          accountType: 'Cuenta SBN2341 • Negocio Activo',
-          walletAddress: 'GCPL...RT7S',
-          createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
-          payments: [],
-        },
-        {
-          id: '4',
-          name: 'Ana López',
-          email: 'ana@email.com',
-          phone: '+52 555 456 7890',
-          totalDebt: 2500,
-          status: 'verified',
-          accountType: 'Cuenta SBN5623 • Negocio Activo',
-          walletAddress: 'GDWX...UV4T',
-          createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-          payments: [
-            {
-              id: 'p2',
-              amount: 2500,
-              date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-              status: 'verified',
-              txHash: 'x9y8z7w6v5u4',
-            },
-          ],
-        },
-      ]
-      setDebtors(sampleDebtors)
-      saveDebtors(sampleDebtors)
-    }
+        })
+      })
 
-    setLoading(false)
-  }
+      // Then, add debt information
+      debtsData.forEach((debt) => {
+        if (debtorsMap.has(debt.customerId)) {
+          const debtor = debtorsMap.get(debt.customerId)
 
-  const saveDebtors = (debtorsData) => {
-    if (!user) return
-    localStorage.setItem(`isis_debtors_${user.id}`, JSON.stringify(debtorsData))
-  }
+          // Sum up total debt from all debts for this customer
+          debtor.totalDebt += Number(debt.pending_amount || 0)
 
-  const addDebtor = (debtorData) => {
-    const newDebtor = {
-      id: Date.now().toString(),
-      ...debtorData,
-      status: 'pending',
-      accountType: `Cuenta SBN${Math.floor(1000 + Math.random() * 9000)} • Negocio Activo`,
-      walletAddress: `G${Math.random().toString(36).substring(2, 8).toUpperCase()}...${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
-      createdAt: new Date().toISOString(),
-      payments: [],
-    }
+          // Update status based on debt status
+          if (debt.status === 'pending' && debtor.status !== 'pending') {
+            debtor.status = 'pending'
+          }
 
-    const updatedDebtors = [...debtors, newDebtor]
-    setDebtors(updatedDebtors)
-    saveDebtors(updatedDebtors)
-    toast.success('Deudor agregado exitosamente')
-    return newDebtor
-  }
-
-  const updateDebtor = (id, updates) => {
-    const updatedDebtors = debtors.map((d) =>
-      d.id === id ? { ...d, ...updates } : d
-    )
-    setDebtors(updatedDebtors)
-    saveDebtors(updatedDebtors)
-    toast.success('Deudor actualizado')
-  }
-
-  const deleteDebtor = (id) => {
-    const updatedDebtors = debtors.filter((d) => d.id !== id)
-    setDebtors(updatedDebtors)
-    saveDebtors(updatedDebtors)
-    toast.success('Deudor eliminado')
-  }
-
-  const addPayment = (debtorId, paymentData) => {
-    const newPayment = {
-      id: `p${Date.now()}`,
-      ...paymentData,
-      status: 'reviewing', // Por defecto en revisión
-      date: new Date().toISOString(),
-      txHash: Math.random().toString(36).substring(2, 15),
-    }
-
-    const updatedDebtors = debtors.map((d) => {
-      if (d.id === debtorId) {
-        return {
-          ...d,
-          payments: [...d.payments, newPayment],
+          // Add payment info if exists
+          if (debt.paid_amount > 0) {
+            debtor.payments.push({
+              id: `payment_${debt.id}`,
+              amount: Number(debt.paid_amount),
+              date: debt.updated_at || debt.updatedAt,
+              status: debt.status === 'paid' ? 'verified' : 'reviewing',
+              txHash: debt.stellar_tx_hash || null,
+              debtId: debt.id,
+            })
+          }
         }
-      }
-      return d
-    })
+      })
 
-    setDebtors(updatedDebtors)
-    saveDebtors(updatedDebtors)
-    toast.success('Pago registrado, pendiente de revisión')
+      setDebtors(Array.from(debtorsMap.values()))
+    } catch (error) {
+      console.error('Error loading data:', error)
+      toast.error('Error al cargar datos')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const approvePayment = (debtorId, paymentId) => {
-    const updatedDebtors = debtors.map((d) => {
-      if (d.id === debtorId) {
-        const payment = d.payments.find((p) => p.id === paymentId)
-        const updatedPayments = d.payments.map((p) =>
-          p.id === paymentId ? { ...p, status: 'verified' } : p
-        )
-        const newDebt = d.totalDebt - (payment?.amount || 0)
-        return {
-          ...d,
-          payments: updatedPayments,
-          totalDebt: newDebt > 0 ? newDebt : 0,
-          status: newDebt <= 0 ? 'verified' : d.status,
-        }
+  const addDebtor = async (debtorData) => {
+    try {
+      // Create customer first
+      const customerData = {
+        companyId: 1,
+        siteId: user.siteId || 1,
+        name: debtorData.name.split(' ')[0],
+        last_name: debtorData.name.split(' ').slice(1).join(' ') || '-',
+        phone_number: debtorData.phone || '-',
+        email: debtorData.email || null,
+        birth_date: '2000-01-01',
+        gender: 'MALE',
       }
-      return d
-    })
 
-    setDebtors(updatedDebtors)
-    saveDebtors(updatedDebtors)
+      const newCustomer = await createCustomer(customerData)
+
+      // Then create the debt
+      const debtData = {
+        siteId: user.siteId || 1,
+        customerId: newCustomer.id,
+        createdByUserId: Number(user.id) || 1,
+        totalAmount: parseFloat(debtorData.totalDebt) || 0,
+        description: debtorData.description || 'Deuda inicial',
+      }
+
+      const newDebt = await createDebt(debtData)
+
+      // Reload data to get updated list
+      await loadData()
+
+      toast.success('Deudor agregado exitosamente')
+      return newCustomer
+    } catch (error) {
+      console.error('Error adding debtor:', error)
+      toast.error(error.message || 'Error al agregar deudor')
+      throw error
+    }
+  }
+
+  const updateDebtor = async (id, updates) => {
+    try {
+      await updateCustomer(id, updates)
+      await loadData()
+      toast.success('Deudor actualizado')
+    } catch (error) {
+      console.error('Error updating debtor:', error)
+      toast.error('Error al actualizar deudor')
+      throw error
+    }
+  }
+
+  const deleteDebtor = async (id) => {
+    try {
+      // Normalize id to number
+      const customerId = Number(id)
+
+      // Delete all debts for this customer first
+      const customerDebts = debts.filter((d) => d.customerId === customerId)
+      await Promise.all(customerDebts.map((debt) => deleteDebt(debt.id)))
+
+      // Then delete the customer
+      await deleteCustomer(customerId)
+      await loadData()
+      toast.success('Deudor eliminado')
+    } catch (error) {
+      console.error('Error deleting debtor:', error)
+      toast.error('Error al eliminar deudor')
+      throw error
+    }
+  }
+
+  const addPayment = async (debtorId, paymentData) => {
+    try {
+      // Normalize debtorId to number
+      const customerId = Number(debtorId)
+
+      // Find the first pending debt for this customer
+      const customerDebt = debts.find(
+        (d) => d.customerId === customerId && d.status !== 'paid'
+      )
+
+      if (!customerDebt) {
+        toast.error('No hay deudas pendientes para este cliente')
+        return
+      }
+
+      // Register payment
+      const paymentPayload = {
+        amount: parseFloat(paymentData.amount) || 0,
+        paymentType: paymentData.paymentType || 'cash',
+        notes: paymentData.notes || null,
+      }
+
+      await registerPayment(customerDebt.id, paymentPayload)
+      await loadData()
+
+      toast.success('Pago registrado exitosamente en blockchain')
+    } catch (error) {
+      console.error('Error adding payment:', error)
+      toast.error(error.message || 'Error al registrar pago')
+      throw error
+    }
+  }
+
+  const approvePayment = async (debtorId, paymentId) => {
+    // This is now automatic in the backend when payment is registered
     toast.success('Pago aprobado')
+    await loadData()
   }
 
-  const rejectPayment = (debtorId, paymentId) => {
-    const updatedDebtors = debtors.map((d) => {
-      if (d.id === debtorId) {
-        return {
-          ...d,
-          payments: d.payments.filter((p) => p.id !== paymentId),
-        }
-      }
-      return d
-    })
-
-    setDebtors(updatedDebtors)
-    saveDebtors(updatedDebtors)
-    toast.success('Pago rechazado')
+  const rejectPayment = async (debtorId, paymentId) => {
+    // For now, this would require backend support to reverse a payment
+    toast.error('Funcionalidad no disponible aún')
   }
 
   const getStats = () => {

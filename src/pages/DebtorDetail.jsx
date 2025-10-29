@@ -30,7 +30,9 @@ export function DebtorDetail() {
   const [paymentAmount, setPaymentAmount] = useState('')
   const [showPaymentForm, setShowPaymentForm] = useState(false)
 
-  const debtor = debtors.find((d) => d.id === id)
+  // Convert id from URL params to number for comparison
+  const debtorId = Number(id)
+  const debtor = debtors.find((d) => d.id === debtorId)
 
   if (!debtor) {
     return (
