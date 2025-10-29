@@ -36,10 +36,14 @@ export function DebtProvider({ children }) {
       setLoading(true)
 
       // Load customers and debts from API
-      const [customersData, debtsData] = await Promise.all([
+      const [customersResponse, debtsResponse] = await Promise.all([
         getAllCustomers(),
         getAllDebts(),
       ])
+
+      // Extract data from backend response wrapper { data: [...], status: 200, message: "success" }
+      const customersData = customersResponse.data || customersResponse || []
+      const debtsData = debtsResponse.data || debtsResponse || []
 
       setCustomers(customersData)
       setDebts(debtsData)
@@ -105,17 +109,16 @@ export function DebtProvider({ children }) {
     try {
       // Create customer first
       const customerData = {
-        companyId: 1,
         siteId: user.siteId || 1,
-        name: debtorData.name.split(' ')[0],
-        last_name: debtorData.name.split(' ').slice(1).join(' ') || '-',
-        phone_number: debtorData.phone || '-',
+        name: debtorData.name, // Enviar nombre completo
+        phoneNumber: debtorData.phone || '0000000000', // camelCase y valor por defecto
         email: debtorData.email || null,
-        birth_date: '2000-01-01',
+        birthDate: '2000-01-01', // camelCase
         gender: 'MALE',
       }
 
-      const newCustomer = await createCustomer(customerData)
+      const customerResponse = await createCustomer(customerData)
+      const newCustomer = customerResponse.data || customerResponse
 
       // Then create the debt
       const debtData = {
