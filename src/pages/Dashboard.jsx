@@ -47,10 +47,10 @@ export function Dashboard() {
     <Layout>
       {/* Welcome Section */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Bienvenido, {user?.name}
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           Gestiona las deudas de {user?.businessName} de forma transparente
         </p>
       </div>
@@ -139,28 +139,28 @@ export function Dashboard() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">Control de Deudas</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Control de Deudas</h2>
             <Badge variant="primary">{filteredDebtors.length} registros</Badge>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                     Cliente
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                     Cuenta
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                     Saldo Pendiente
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                     Estado
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                     Acción
                   </th>
                 </tr>
@@ -168,7 +168,7 @@ export function Dashboard() {
               <tbody className="divide-y divide-gray-200">
                 {filteredDebtors.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan="5" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                       No se encontraron deudores
                     </td>
                   </tr>
@@ -176,21 +176,21 @@ export function Dashboard() {
                   filteredDebtors.map((debtor) => (
                     <tr
                       key={debtor.id}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-gray-50 dark:bg-gray-700 transition-colors"
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <Avatar name={debtor.name} />
                           <div>
-                            <p className="font-semibold text-gray-900">
+                            <p className="font-semibold text-gray-900 dark:text-white">
                               {debtor.name}
                             </p>
-                            <p className="text-sm text-gray-500">{debtor.email}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{debtor.email}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <p className="text-sm text-gray-600">{debtor.accountType}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{debtor.accountType}</p>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <p
@@ -199,7 +199,7 @@ export function Dashboard() {
                               ? 'text-red-600'
                               : debtor.totalDebt > 2000
                               ? 'text-orange-600'
-                              : 'text-gray-900'
+                              : 'text-gray-900 dark:text-white'
                           }`}
                         >
                           {formatCurrency(debtor.totalDebt)}
@@ -255,8 +255,8 @@ function StatsCard({ title, value, icon, color }) {
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-            <p className="text-2xl font-bold text-gray-900">{value}</p>
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">{title}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
           </div>
           <div
             className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colorClasses[color]} flex items-center justify-center text-white shadow-lg`}

@@ -224,7 +224,7 @@ export function Register() {
                   className="w-20 h-20 object-contain"
                 />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">Crear Cuenta</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Crear Cuenta</h2>
             </div>
 
             {/* Indicador de progreso */}
@@ -443,7 +443,7 @@ export function Register() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 ¿Ya tienes cuenta?{' '}
                 <Link to="/login" className="font-semibold text-purple-600 hover:text-purple-700">
                   Inicia sesión

@@ -117,23 +117,23 @@ export function AddDebtor() {
 
         <Card>
           <CardHeader>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
               Registrar Deuda
             </h2>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 dark:text-gray-300 mt-1">
               Selecciona un cliente existente o crea uno nuevo
             </p>
           </CardHeader>
           <CardContent className="p-6">
             {/* Mode Selector */}
-            <div className="flex gap-4 mb-6 p-1 bg-gray-100 rounded-xl">
+            <div className="flex gap-4 mb-6 p-1 bg-gray-100 dark:bg-gray-700 rounded-xl">
               <button
                 type="button"
                 onClick={() => setMode('select')}
                 className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
                   mode === 'select'
                     ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white'
                 }`}
               >
                 <UserCheck className="inline-block w-5 h-5 mr-2" />
@@ -145,7 +145,7 @@ export function AddDebtor() {
                 className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
                   mode === 'new'
                     ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white'
                 }`}
               >
                 <User className="inline-block w-5 h-5 mr-2" />
@@ -240,7 +240,7 @@ export function AddDebtor() {
                   }
                   error={errors.totalDebt}
                 />
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   Deja en blanco si no hay deuda inicial
                 </p>
               </div>

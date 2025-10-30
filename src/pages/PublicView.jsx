@@ -58,11 +58,11 @@ export function PublicView() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
         <Card className="max-w-md">
           <CardContent className="p-12 text-center">
-            <Globe className="w-16 h-16 text-gray-400 mx-auto mb-4 animate-spin" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+            <Globe className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4 animate-spin" />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
               Cargando...
             </h2>
           </CardContent>
@@ -73,14 +73,14 @@ export function PublicView() {
 
   if (!businessData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
         <Card className="max-w-md">
           <CardContent className="p-12 text-center">
-            <Globe className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+            <Globe className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
               Negocio no encontrado
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               La página pública que buscas no existe
             </p>
           </CardContent>
@@ -100,12 +100,12 @@ export function PublicView() {
                 <ShieldCheck className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                   {businessData.name}
                 </h1>
                 <div className="flex items-center gap-2 mt-1">
                   <Globe className="w-4 h-4 text-green-600" />
-                  <span className="text-sm text-gray-600">Vista Pública</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Vista Pública</span>
                 </div>
               </div>
             </div>
@@ -149,7 +149,7 @@ export function PublicView() {
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 Registro Público de Deudas
               </h2>
               <Badge variant="primary">{debtors.length} registros</Badge>
@@ -158,21 +158,21 @@ export function PublicView() {
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                       Deudor
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                       Wallet
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                       Saldo Pendiente
                     </th>
-                    <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                       Estado
                     </th>
-                    <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                       Acción
                     </th>
                   </tr>
@@ -180,7 +180,7 @@ export function PublicView() {
                 <tbody className="divide-y divide-gray-200">
                   {debtors.length === 0 ? (
                     <tr>
-                      <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                      <td colSpan="5" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400 dark:text-gray-500">
                         No hay deudores registrados
                       </td>
                     </tr>
@@ -188,23 +188,23 @@ export function PublicView() {
                     debtors.map((debtor) => (
                       <tr
                         key={debtor.id}
-                        className="hover:bg-gray-50 transition-colors"
+                        className="hover:bg-gray-50 dark:bg-gray-700 transition-colors"
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <Avatar name={debtor.name} />
                             <div>
-                              <p className="font-semibold text-gray-900">
+                              <p className="font-semibold text-gray-900 dark:text-white">
                                 {debtor.name}
                               </p>
-                              <p className="text-sm text-gray-500">
+                              <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                 {debtor.accountType}
                               </p>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <code className="text-xs text-gray-600 font-mono">
+                          <code className="text-xs text-gray-600 dark:text-gray-300 font-mono">
                             {debtor.walletAddress}
                           </code>
                         </td>
@@ -215,7 +215,7 @@ export function PublicView() {
                                 ? 'text-red-600'
                                 : debtor.totalDebt > 2000
                                 ? 'text-orange-600'
-                                : 'text-gray-900'
+                                : 'text-gray-900 dark:text-white'
                             }`}
                           >
                             {formatCurrency(debtor.totalDebt)}
@@ -245,7 +245,7 @@ export function PublicView() {
                               </Button>
                             </Link>
                           ) : (
-                            <span className="text-sm text-gray-400">Sin deuda</span>
+                            <span className="text-sm text-gray-400 dark:text-gray-500">Sin deuda</span>
                           )}
                         </td>
                       </tr>
@@ -259,7 +259,7 @@ export function PublicView() {
 
         {/* Footer Info */}
         <div className="mt-8 text-center">
-          <div className="inline-flex items-center gap-2 text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm">
+          <div className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 bg-white px-4 py-2 rounded-full shadow-sm">
             <ShieldCheck className="w-4 h-4 text-green-600" />
             <span>Datos verificados en Stellar Blockchain</span>
           </div>

@@ -121,11 +121,11 @@ export function PublicPayment() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
         <Card className="max-w-md">
           <CardContent className="p-12 text-center">
-            <Loader2 className="w-16 h-16 text-gray-400 mx-auto mb-4 animate-spin" />
-            <p className="text-gray-600">Cargando información...</p>
+            <Loader2 className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4 animate-spin" />
+            <p className="text-gray-600 dark:text-gray-300">Cargando información...</p>
           </CardContent>
         </Card>
       </div>
@@ -134,12 +134,12 @@ export function PublicPayment() {
 
   if (!businessData || !debtor) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
         <Card className="max-w-md">
           <CardContent className="p-12 text-center">
-            <Info className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Deudor no encontrado</h2>
-            <p className="text-gray-600 mb-4">No se pudo cargar la información del deudor.</p>
+            <Info className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Deudor no encontrado</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">No se pudo cargar la información del deudor.</p>
             <Button onClick={() => navigate(`/public/${siteId}`)} variant="primary">
               Volver al Registro Público
             </Button>
@@ -157,10 +157,10 @@ export function PublicPayment() {
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-12 h-12 text-green-600" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
               ¡Pago Registrado!
             </h2>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
               Tu pago de <span className="font-bold text-green-600">{formatCurrency(parseFloat(paymentAmount))}</span> ha sido
               registrado exitosamente en la blockchain de Stellar
             </p>
@@ -215,15 +215,15 @@ export function PublicPayment() {
                 <ShieldCheck className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                   {businessData.name}
                 </h1>
-                <p className="text-sm text-gray-600">Portal de Pagos Públicos</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Portal de Pagos Públicos</p>
               </div>
             </div>
             <button
               onClick={() => navigate(`/public/${siteId}`)}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white"
             >
               <ArrowLeft size={20} />
               <span className="hidden sm:inline">Volver</span>
@@ -237,7 +237,7 @@ export function PublicPayment() {
           {/* Debtor Info */}
           <Card>
             <CardHeader>
-              <h3 className="text-lg font-bold text-gray-900">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                 Información del Deudor
               </h3>
             </CardHeader>
@@ -245,13 +245,13 @@ export function PublicPayment() {
               <div className="flex items-center gap-3 mb-4">
                 <Avatar name={debtor.name} size="lg" />
                 <div>
-                  <h4 className="font-semibold text-gray-900">{debtor.name}</h4>
-                  <p className="text-sm text-gray-500">{debtor.email}</p>
+                  <h4 className="font-semibold text-gray-900 dark:text-white">{debtor.name}</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">{debtor.email}</p>
                 </div>
               </div>
 
               <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4">
-                <p className="text-xs text-gray-600 mb-1">Saldo Pendiente</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Saldo Pendiente</p>
                 <p className="text-3xl font-bold text-red-600">
                   {formatCurrency(debtor.totalDebt)}
                 </p>
@@ -259,20 +259,20 @@ export function PublicPayment() {
 
               <div className="space-y-3 pt-4 border-t border-gray-200">
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Cuenta</p>
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1">Cuenta</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {debtor.accountType}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Wallet Address</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1">Wallet Address</p>
                   <div className="flex items-center gap-2">
-                    <code className="text-xs font-mono text-gray-700 flex-1">
+                    <code className="text-xs font-mono text-gray-700 dark:text-gray-200 flex-1">
                       {debtor.walletAddress}
                     </code>
                     <button
                       onClick={() => copyToClipboard(debtor.walletAddress)}
-                      className="text-gray-400 hover:text-gray-600"
+                      className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300"
                     >
                       <Copy size={16} />
                     </button>
@@ -285,10 +285,10 @@ export function PublicPayment() {
           {/* Payment Form */}
           <Card>
             <CardHeader>
-              <h3 className="text-lg font-bold text-gray-900">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                 Realizar Pago
               </h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                 Paga tu deuda a través de Stellar Blockchain
               </p>
             </CardHeader>
@@ -307,7 +307,7 @@ export function PublicPayment() {
                     onChange={(e) => setPaymentAmount(e.target.value)}
                     disabled={processing}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1">
                     Máximo: {formatCurrency(debtor.totalDebt)}
                   </p>
                 </div>
@@ -381,7 +381,7 @@ export function PublicPayment() {
                   )}
                 </Button>
 
-                <p className="text-xs text-center text-gray-500">
+                <p className="text-xs text-center text-gray-500 dark:text-gray-400 dark:text-gray-500">
                   Transacción segura verificada por Stellar Blockchain
                 </p>
               </form>

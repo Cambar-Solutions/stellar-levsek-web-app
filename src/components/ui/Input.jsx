@@ -23,7 +23,7 @@ export function Input({ className, error, icon: Icon, ...props }) {
         {...props}
       />
       {error && (
-        <p className="mt-1.5 text-sm text-red-600">{error}</p>
+        <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
     </div>
   )
@@ -58,7 +58,7 @@ export function Textarea({ className, error, ...props }) {
         {...props}
       />
       {error && (
-        <p className="mt-1.5 text-sm text-red-600">{error}</p>
+        <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
     </div>
   )

@@ -51,10 +51,10 @@ export function Debtors() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Gestión de Deudores
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             Administra todos los deudores de tu negocio
           </p>
         </div>
@@ -82,10 +82,10 @@ export function Debtors() {
       {filteredDebtors.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="w-8 h-8 text-gray-400" />
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
             </div>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
               {searchQuery ? 'No se encontraron deudores' : 'No tienes deudores registrados'}
             </p>
             <Link to="/debtors/add">
@@ -109,24 +109,24 @@ export function Debtors() {
                   <div className="flex items-center gap-3">
                     <Avatar name={debtor.name} size="lg" />
                     <div>
-                      <h3 className="font-bold text-gray-900 text-lg">
+                      <h3 className="font-bold text-gray-900 dark:text-white text-lg">
                         {debtor.name}
                       </h3>
-                      <p className="text-sm text-gray-500">{debtor.email}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">{debtor.email}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Amount */}
                 <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 mb-4">
-                  <p className="text-xs text-gray-600 mb-1">Saldo Pendiente</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Saldo Pendiente</p>
                   <p
                     className={`text-2xl font-bold ${
                       debtor.totalDebt > 4000
                         ? 'text-red-600'
                         : debtor.totalDebt > 2000
                         ? 'text-orange-600'
-                        : 'text-gray-900'
+                        : 'text-gray-900 dark:text-white'
                     }`}
                   >
                     {formatCurrency(debtor.totalDebt)}
@@ -136,7 +136,7 @@ export function Debtors() {
                 {/* Info */}
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Estado:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Estado:</span>
                     <Badge
                       variant={
                         debtor.status === 'verified' ? 'verified' : 'pending'
@@ -146,14 +146,14 @@ export function Debtors() {
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Pagos:</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="text-gray-600 dark:text-gray-300">Pagos:</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">
                       {debtor.payments.length}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Desde:</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="text-gray-600 dark:text-gray-300">Desde:</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">
                       {formatDate(debtor.createdAt)}
                     </span>
                   </div>

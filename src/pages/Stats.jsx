@@ -56,10 +56,10 @@ export function Stats() {
     <Layout>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Estadísticas Avanzadas
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           Análisis detallado de las cuentas por cobrar de {user?.businessName}
         </p>
       </div>
@@ -98,7 +98,7 @@ export function Stats() {
       <div className="grid md:grid-cols-2 gap-6 mb-8">
         <Card>
           <CardHeader>
-            <h3 className="text-lg font-bold text-gray-900">Estado de Cuentas</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Estado de Cuentas</h3>
           </CardHeader>
           <CardContent className="p-6">
             <div className="space-y-4">
@@ -122,7 +122,7 @@ export function Stats() {
 
         <Card>
           <CardHeader>
-            <h3 className="text-lg font-bold text-gray-900">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
               Distribución de Deuda
             </h3>
           </CardHeader>
@@ -158,7 +158,7 @@ export function Stats() {
       {/* Top Debtors */}
       <Card className="mb-8">
         <CardHeader>
-          <h3 className="text-lg font-bold text-gray-900">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             Top 5 Deudores (Mayor Saldo)
           </h3>
         </CardHeader>
@@ -167,7 +167,7 @@ export function Stats() {
             {topDebtors.map((debtor, index) => (
               <div
                 key={debtor.id}
-                className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                className="p-6 flex items-center justify-between hover:bg-gray-50 dark:bg-gray-700 transition-colors"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -176,8 +176,8 @@ export function Stats() {
                     </span>
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{debtor.name}</p>
-                    <p className="text-sm text-gray-500">{debtor.email}</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">{debtor.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{debtor.email}</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -197,13 +197,13 @@ export function Stats() {
       {/* Recent Payments */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-bold text-gray-900">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             Pagos Recientes
           </h3>
         </CardHeader>
         <CardContent className="p-0">
           {recentPayments.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-gray-500 dark:text-gray-400">
               No hay pagos registrados
             </div>
           ) : (
@@ -211,17 +211,17 @@ export function Stats() {
               {recentPayments.map((payment) => (
                 <div
                   key={payment.id}
-                  className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  className="p-6 flex items-center justify-between hover:bg-gray-50 dark:bg-gray-700 transition-colors"
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                       <CheckCircle2 className="w-6 h-6 text-green-600" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         {payment.debtorName}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {new Date(payment.date).toLocaleDateString('es-MX', {
                           year: 'numeric',
                           month: 'long',
@@ -236,7 +236,7 @@ export function Stats() {
                     <p className="text-xl font-bold text-green-600">
                       {formatCurrency(payment.amount)}
                     </p>
-                    <code className="text-xs text-gray-500 font-mono">
+                    <code className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                       TX: {payment.txHash}
                     </code>
                   </div>
@@ -262,14 +262,14 @@ function StatsCard({ title, value, icon, color, trend }) {
     <Card className="hover:shadow-lg transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
-          <p className="text-sm font-medium text-gray-600">{title}</p>
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{title}</p>
           <div
             className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colorClasses[color]} flex items-center justify-center text-white shadow-lg`}
           >
             {icon}
           </div>
         </div>
-        <p className="text-2xl font-bold text-gray-900 mb-2">{value}</p>
+        <p className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{value}</p>
         {trend !== undefined && (
           <div className="flex items-center gap-1 text-sm">
             {trend > 0 ? (
@@ -283,7 +283,7 @@ function StatsCard({ title, value, icon, color, trend }) {
                 <span className="text-red-600 font-semibold">{trend}%</span>
               </>
             )}
-            <span className="text-gray-500 ml-1">vs mes anterior</span>
+            <span className="text-gray-500 dark:text-gray-400 ml-1">vs mes anterior</span>
           </div>
         )}
       </CardContent>
@@ -296,7 +296,7 @@ function StatusItem({ icon, label, value, percentage, color }) {
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
         {icon}
-        <span className="text-sm font-medium text-gray-900">{label}</span>
+        <span className="text-sm font-medium text-gray-900 dark:text-white">{label}</span>
       </div>
       <div className="flex items-center gap-3">
         <div className="w-32 bg-gray-200 rounded-full h-2">
@@ -305,7 +305,7 @@ function StatusItem({ icon, label, value, percentage, color }) {
             style={{ width: `${percentage}%` }}
           ></div>
         </div>
-        <span className="text-sm font-bold text-gray-900 w-8">{value}</span>
+        <span className="text-sm font-bold text-gray-900 dark:text-white w-8">{value}</span>
       </div>
     </div>
   )
@@ -314,7 +314,7 @@ function StatusItem({ icon, label, value, percentage, color }) {
 function DebtRangeItem({ range, count }) {
   return (
     <div className="flex items-center justify-between py-2">
-      <span className="text-sm text-gray-700">{range}</span>
+      <span className="text-sm text-gray-700 dark:text-gray-200">{range}</span>
       <Badge variant="default">{count} deudores</Badge>
     </div>
   )
