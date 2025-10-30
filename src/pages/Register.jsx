@@ -217,11 +217,14 @@ export function Register() {
         <Card className="shadow-2xl">
           <CardContent className="p-8">
             <div className="mb-6 text-center">
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl mb-3 shadow-md">
-                <Building2 className="w-7 h-7 text-white" />
+              <div className="inline-flex items-center justify-center mb-3">
+                <img
+                  src="/isis.png"
+                  alt="ISIS Logo"
+                  className="w-20 h-20 object-contain"
+                />
               </div>
               <h2 className="text-2xl font-bold text-gray-900">Crear Cuenta</h2>
-             
             </div>
 
             {/* Indicador de progreso */}
