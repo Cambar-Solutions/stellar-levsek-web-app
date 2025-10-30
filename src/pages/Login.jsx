@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { Button } from '../components/ui/Button'
 import { Input, Label } from '../components/ui/Input'
 import { Card, CardContent } from '../components/ui/Card'
-import { Mail, Lock, ShieldCheck, TrendingUp, Users, Wallet } from 'lucide-react'
+import { Mail, Lock, ShieldCheck, TrendingUp, Users, Wallet, AlertCircle, Eye, EyeOff } from 'lucide-react'
 
 export function Login() {
   const navigate = useNavigate()
@@ -14,15 +14,80 @@ export function Login() {
     password: '',
   })
   const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState({})
+  const [showPassword, setShowPassword] = useState(false)
+  const [touched, setTouched] = useState({})
+
+  // Validación en tiempo real (Heurística: Prevención de errores)
+  const validateField = (name, value) => {
+    const newErrors = { ...errors }
+
+    switch (name) {
+      case 'email':
+        if (!value) {
+          newErrors.email = 'El correo electrónico es requerido'
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          newErrors.email = 'Por favor ingresa un correo electrónico válido'
+        } else {
+          delete newErrors.email
+        }
+        break
+      case 'password':
+        if (!value) {
+          newErrors.password = 'La contraseña es requerida'
+        } else if (value.length < 8) {
+          newErrors.password = 'La contraseña debe tener al menos 8 caracteres'
+        } else {
+          delete newErrors.password
+        }
+        break
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleBlur = (field) => {
+    setTouched({ ...touched, [field]: true })
+    validateField(field, formData[field])
+  }
+
+  const handleChange = (field, value) => {
+    setFormData({ ...formData, [field]: value })
+    if (touched[field]) {
+      validateField(field, value)
+    }
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSubmit(e)
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    // Validar todos los campos antes de enviar
+    const emailValid = validateField('email', formData.email)
+    const passwordValid = validateField('password', formData.password)
+
+    if (!emailValid || !passwordValid) {
+      setTouched({ email: true, password: true })
+      return
+    }
+
     setLoading(true)
 
     const result = await login(formData.email, formData.password)
 
     if (result.success) {
       navigate('/dashboard')
+    } else {
+      setErrors({
+        submit: result.error || 'Error al iniciar sesión. Por favor verifica tus credenciales.'
+      })
     }
 
     setLoading(false)
@@ -78,36 +143,88 @@ export function Login() {
         <Card className="shadow-2xl">
           <CardContent className="p-8">
             <div className="mb-8 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-4 shadow-lg">
-                <ShieldCheck className="w-8 h-8 text-white" />
+              <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl mb-3 shadow-md">
+                <ShieldCheck className="w-7 h-7 text-white" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900">Bienvenido a ISIS</h2>
-              <p className="text-gray-600 mt-2">Inicia sesión en tu cuenta</p>
+              <h2 className="text-2xl font-bold text-gray-900">Bienvenido a ISIS</h2>
+              <p className="text-sm text-gray-600 mt-1">Inicia sesión en tu cuenta</p>
             </div>
+
+            {/* Error general de envío */}
+            {errors.submit && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-red-800">{errors.submit}</p>
+                  <p className="text-xs text-red-600 mt-1">
+                    Verifica que tu correo y contraseña sean correctos
+                  </p>
+                </div>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <Label required>Correo electrónico</Label>
                 <Input
                   type="email"
-                  placeholder="tu@email.com"
+                  placeholder="ejemplo@correo.com"
                   icon={Mail}
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
+                  onChange={(e) => handleChange('email', e.target.value)}
+                  onBlur={() => handleBlur('email')}
+                  onKeyPress={handleKeyPress}
+                  autoComplete="email"
                 />
+                <div className="min-h-[20px] mt-1.5">
+                  {touched.email && errors.email && (
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div>
-                <Label required>Contraseña</Label>
+                <div className="flex items-center justify-between mb-1">
+                  <Label required>Contraseña</Label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                  >
+                    {showPassword ? (
+                      <>
+                        <EyeOff className="w-3.5 h-3.5" />
+                        Ocultar
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-3.5 h-3.5" />
+                        Mostrar
+                      </>
+                    )}
+                  </button>
+                </div>
                 <Input
-                  type="password"
-                  placeholder="••••••••"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Mínimo 8 caracteres"
                   icon={Lock}
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
+                  onChange={(e) => handleChange('password', e.target.value)}
+                  onBlur={() => handleBlur('password')}
+                  onKeyPress={handleKeyPress}
+                  autoComplete="current-password"
                 />
+                <div className="min-h-[20px] mt-1.5">
+                  {touched.password && errors.password && (
+                    <p className="text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <Button
@@ -115,9 +232,19 @@ export function Login() {
                 variant="primary"
                 size="lg"
                 className="w-full"
-                disabled={loading}
+                disabled={loading || Object.keys(errors).length > 0}
               >
-                {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Iniciando sesión...
+                  </span>
+                ) : (
+                  'Iniciar Sesión'
+                )}
               </Button>
             </form>
 
@@ -130,12 +257,7 @@ export function Login() {
               </p>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Conexión segura con Stellar</span>
-              </div>
-            </div>
+            
           </CardContent>
         </Card>
       </div>

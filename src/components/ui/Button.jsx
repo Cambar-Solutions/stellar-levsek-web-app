@@ -29,6 +29,7 @@ export function Button({
     <button
       className={cn(
         'rounded-xl font-semibold transition-all duration-200 ease-out',
+        'flex items-center justify-center gap-2',
         'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none',
         'focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2',
         buttonVariants[variant],
