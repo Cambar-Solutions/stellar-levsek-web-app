@@ -1,4 +1,5 @@
 import { useDebt } from '../contexts/DebtContext'
+import { useConfirm } from '../hooks/useConfirm'
 import { Layout } from '../components/Layout'
 import { Card, CardContent, CardHeader } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
@@ -18,6 +19,7 @@ import toast from 'react-hot-toast'
 
 export function PendingPayments() {
   const { debtors, approvePayment, rejectPayment } = useDebt()
+  const { confirm, ConfirmDialog } = useConfirm()
 
   // Obtener todos los pagos pendientes de revisión
   const pendingPayments = debtors
@@ -53,20 +55,37 @@ export function PendingPayments() {
     toast.success('Copiado al portapapeles')
   }
 
-  const handleApprove = (debtorId, paymentId) => {
-    if (window.confirm('¿Aprobar este pago?')) {
+  const handleApprove = async (debtorId, paymentId, amount) => {
+    const confirmed = await confirm({
+      title: 'Aprobar pago',
+      message: `¿Confirmas que quieres aprobar este pago de ${formatCurrency(amount)}? El saldo del deudor se actualizará automáticamente.`,
+      type: 'success',
+      confirmText: 'Aprobar',
+      cancelText: 'Cancelar'
+    })
+
+    if (confirmed) {
       approvePayment(debtorId, paymentId)
     }
   }
 
-  const handleReject = (debtorId, paymentId) => {
-    if (window.confirm('¿Rechazar y eliminar este pago?')) {
+  const handleReject = async (debtorId, paymentId) => {
+    const confirmed = await confirm({
+      title: 'Rechazar pago',
+      message: '¿Estás seguro de rechazar este pago? Esta acción no se puede deshacer.',
+      type: 'danger',
+      confirmText: 'Rechazar',
+      cancelText: 'Cancelar'
+    })
+
+    if (confirmed) {
       rejectPayment(debtorId, paymentId)
     }
   }
 
   return (
     <Layout>
+      <ConfirmDialog />
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
@@ -221,7 +240,7 @@ export function PendingPayments() {
                     <Button
                       variant="success"
                       size="lg"
-                      onClick={() => handleApprove(payment.debtor.id, payment.id)}
+                      onClick={() => handleApprove(payment.debtor.id, payment.id, payment.amount)}
                       className="flex items-center justify-center gap-2"
                     >
                       <Check size={20} />

@@ -16,7 +16,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { getPublicSiteInfo } from '../services/debtService'
+import { getPublicSiteInfo, registerPayment, getDebtsByCustomer } from '../services/debtService'
 
 export function PublicPayment() {
   const { siteId, debtorId: debtorIdParam } = useParams()
@@ -105,14 +105,34 @@ export function PublicPayment() {
       const result = await simulateStellarPayment(amount)
 
       if (result.success) {
-        // TODO: En producción, esto debería hacer un POST a la API
-        // para registrar el pago público. Por ahora solo mostramos éxito.
-        // Endpoint necesario: POST /debts/:debtId/public-payment
+        // Obtener las deudas del cliente para encontrar la primera pendiente
+        const debtsResponse = await getDebtsByCustomer(debtor.id)
+        const customerDebts = debtsResponse.data || debtsResponse || []
 
+        // Buscar la primera deuda que no esté completamente pagada
+        const pendingDebt = customerDebts.find(d => {
+          const pending = d.pendingAmount || d.pending_amount || 0
+          return pending > 0
+        })
+
+        if (!pendingDebt) {
+          toast.error('No se encontró una deuda pendiente para este cliente')
+          return
+        }
+
+        // Registrar el pago en la deuda existente
+        await registerPayment(pendingDebt.id, {
+          amount: amount,
+          paymentType: 'stellar',
+          notes: `Pago público desde Stellar - Ref: ${txReference} - TxHash: ${result.txHash}`
+        })
+
+        console.log('✅ Pago público registrado en el backend:', result.txHash)
         setPaymentSuccess(true)
         toast.success('¡Pago registrado exitosamente!')
       }
     } catch (error) {
+      console.error('Error al procesar el pago:', error)
       toast.error('Error al procesar el pago')
     } finally {
       setProcessing(false)
@@ -151,28 +171,28 @@ export function PublicPayment() {
 
   if (paymentSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
         <Card className="max-w-2xl w-full">
           <CardContent className="p-12 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="w-12 h-12 text-green-600" />
+            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
               ¡Pago Registrado!
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-              Tu pago de <span className="font-bold text-green-600">{formatCurrency(parseFloat(paymentAmount))}</span> ha sido
+              Tu pago de <span className="font-bold text-green-600 dark:text-green-400">{formatCurrency(parseFloat(paymentAmount))}</span> ha sido
               registrado exitosamente en la blockchain de Stellar
             </p>
 
-            <div className="bg-blue-50 rounded-xl p-6 mb-8 text-left">
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 mb-8 text-left">
               <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm text-blue-900 font-semibold mb-2">
+                  <p className="text-sm text-blue-900 dark:text-blue-200 font-semibold mb-2">
                     Próximos pasos:
                   </p>
-                  <ul className="text-sm text-blue-800 space-y-1">
+                  <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
                     <li>• Tu pago está ahora <strong>en revisión</strong></li>
                     <li>• El administrador de {businessData.name} lo verificará</li>
                     <li>• Recibirás confirmación una vez aprobado</li>
@@ -205,9 +225,9 @@ export function PublicPayment() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -223,7 +243,7 @@ export function PublicPayment() {
             </div>
             <button
               onClick={() => navigate(`/public/${siteId}`)}
-              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white"
+              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
             >
               <ArrowLeft size={20} />
               <span className="hidden sm:inline">Volver</span>
@@ -250,29 +270,29 @@ export function PublicPayment() {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4">
+              <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-4">
                 <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Saldo Pendiente</p>
-                <p className="text-3xl font-bold text-red-600">
+                <p className="text-3xl font-bold text-red-600 dark:text-red-400">
                   {formatCurrency(debtor.totalDebt)}
                 </p>
               </div>
 
-              <div className="space-y-3 pt-4 border-t border-gray-200">
+              <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1">Cuenta</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Cuenta</p>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {debtor.accountType}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mb-1">Wallet Address</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Wallet Address</p>
                   <div className="flex items-center gap-2">
                     <code className="text-xs font-mono text-gray-700 dark:text-gray-200 flex-1">
                       {debtor.walletAddress}
                     </code>
                     <button
                       onClick={() => copyToClipboard(debtor.walletAddress)}
-                      className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300"
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     >
                       <Copy size={16} />
                     </button>
@@ -323,21 +343,21 @@ export function PublicPayment() {
                   />
                 </div>
 
-                <div className="bg-blue-50 rounded-xl p-4">
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
                   <div className="flex items-start gap-3">
-                    <Wallet className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <Wallet className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-semibold text-blue-900 mb-1">
+                      <p className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-1">
                         Wallet de Destino
                       </p>
                       <div className="flex items-center gap-2">
-                        <code className="text-xs font-mono text-blue-700">
+                        <code className="text-xs font-mono text-blue-700 dark:text-blue-300">
                           {businessData.walletAddress}
                         </code>
                         <button
                           type="button"
                           onClick={() => copyToClipboard(businessData.walletAddress)}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                         >
                           <Copy size={14} />
                         </button>
@@ -346,10 +366,10 @@ export function PublicPayment() {
                   </div>
                 </div>
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800/50 rounded-xl p-4">
                   <div className="flex items-start gap-3">
-                    <Info className="w-5 h-5 text-yellow-700 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-yellow-800">
+                    <Info className="w-5 h-5 text-yellow-700 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-yellow-800 dark:text-yellow-300">
                       <p className="font-semibold mb-1">Importante:</p>
                       <ul className="space-y-1 text-xs">
                         <li>• El pago será registrado en la blockchain Stellar</li>

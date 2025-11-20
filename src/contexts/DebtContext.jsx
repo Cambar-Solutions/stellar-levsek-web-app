@@ -113,6 +113,8 @@ export function DebtProvider({ children }) {
           }
 
           // Add payment info if exists
+          // Los pagos van como "reviewing" para que el admin los apruebe
+          // Solo se marcan como "verified" cuando la deuda está completamente pagada
           if (paidAmount > 0) {
             debtor.payments.push({
               id: `payment_${debt.id}`,
@@ -144,29 +146,42 @@ export function DebtProvider({ children }) {
 
   const addDebtor = async (debtorData) => {
     try {
+      // Split full name into name and lastName
+      const fullName = debtorData.name.trim()
+      const nameParts = fullName.split(' ')
+      const firstName = nameParts[0]
+      const lastName = nameParts.slice(1).join(' ') || firstName // Si no hay apellido, usar el nombre
+
       // Create customer first
       const customerData = {
         siteId: user.siteId || 1,
-        name: debtorData.name, // Enviar nombre completo
-        phoneNumber: debtorData.phone || '0000000000', // camelCase y valor por defecto
+        name: firstName,
+        lastName: lastName,
+        phoneNumber: debtorData.phone || '0000000000',
         email: debtorData.email || null,
-        birthDate: '2000-01-01', // camelCase
+        birthDate: '2000-01-01',
         gender: 'MALE',
       }
 
+      console.log('📤 Creating customer with data:', customerData)
       const customerResponse = await createCustomer(customerData)
       const newCustomer = customerResponse.data || customerResponse
+      console.log('✅ Customer created:', newCustomer)
 
-      // Then create the debt
-      const debtData = {
-        siteId: user.siteId || 1,
-        customerId: newCustomer.id,
-        createdByUserId: Number(user.id) || 1,
-        totalAmount: parseFloat(debtorData.totalDebt) || 0,
-        description: debtorData.description || 'Deuda inicial',
+      // Then create the debt if amount > 0
+      if (parseFloat(debtorData.totalDebt) > 0) {
+        const debtData = {
+          siteId: user.siteId || 1,
+          customerId: newCustomer.id,
+          createdByUserId: Number(user.id) || 1,
+          totalAmount: parseFloat(debtorData.totalDebt),
+          description: debtorData.description || 'Deuda inicial',
+        }
+
+        console.log('📤 Creating debt with data:', debtData)
+        await createDebt(debtData)
+        console.log('✅ Debt created successfully')
       }
-
-      await createDebt(debtData)
 
       // Reload data to get updated list
       await loadData()
@@ -197,18 +212,30 @@ export function DebtProvider({ children }) {
       // Normalize id to number
       const customerId = Number(id)
 
-      // Delete all debts for this customer first
+      // Verificar si el deudor tiene deudas asociadas
       const customerDebts = debts.filter((d) => d.customerId === customerId)
-      await Promise.all(customerDebts.map((debt) => deleteDebt(debt.id)))
 
-      // Then delete the customer
+      if (customerDebts.length > 0) {
+        toast.error('No se puede eliminar: el deudor tiene deudas registradas')
+        return // No lanzar error, solo retornar
+      }
+
+      // Verificar si el deudor tiene pagos (verificar en debtors)
+      const debtor = debtors.find((d) => d.id === customerId)
+      if (debtor && debtor.payments && debtor.payments.length > 0) {
+        toast.error('No se puede eliminar: el deudor tiene pagos registrados')
+        return // No lanzar error, solo retornar
+      }
+
+      // Si no hay deudas ni pagos, eliminar el customer
       await deleteCustomer(customerId)
       await loadData()
-      toast.success('Deudor eliminado')
+      toast.success('Deudor eliminado exitosamente')
     } catch (error) {
       console.error('Error deleting debtor:', error)
-      toast.error('Error al eliminar deudor')
-      throw error
+      const errorMessage = error.response?.data?.message || error.message || 'Error al eliminar deudor'
+      toast.error(errorMessage)
+      // No lanzar el error para que no rompa la UI
     }
   }
 
@@ -219,11 +246,13 @@ export function DebtProvider({ children }) {
       const customerId = Number(debtorId)
 
       // Find the first pending debt for this customer
-      const customerDebt = debts.find(
-        (d) => d.customerId === customerId && d.status !== 'paid'
-      )
+      const customerDebt = debts.find((d) => {
+        const pending = d.pendingAmount || d.pending_amount || 0
+        return d.customerId === customerId && pending > 0
+      })
 
       if (!customerDebt) {
+        console.log('❌ No pending debts found. Available debts:', debts.filter(d => d.customerId === customerId))
         toast.error('No hay deudas pendientes para este cliente')
         return
       }
@@ -272,18 +301,20 @@ export function DebtProvider({ children }) {
         return
       }
 
-      // If payment has a debtId, use the approve endpoint
+      // Actualizar el estado de la deuda a "paid" (pagada)
+      // NO usar approvePaymentAPI porque eso crea un pago duplicado
       if (payment.debtId) {
-        await approvePaymentAPI(payment.debtId, {
-          amount: payment.amount,
-          paymentType: 'cash', // Default, could be extracted from payment data
-          notes: `Pago aprobado manualmente - ${payment.txHash || ''}`,
+        // Solo actualizar el status de la deuda a "paid"
+        await updateDebt(payment.debtId, {
+          status: 'paid'
         })
-        toast.success('Pago aprobado y registrado')
+        console.log('✅ Pago aprobado, deuda marcada como pagada:', payment)
+        toast.success('Pago aprobado exitosamente')
       } else {
         toast.error('No se puede aprobar: pago sin ID de deuda')
       }
 
+      // Recargar datos para reflejar cambios
       await loadData()
     } catch (error) {
       console.error('Error approving payment:', error)
@@ -293,9 +324,31 @@ export function DebtProvider({ children }) {
 
   const rejectPayment = async (debtorId, paymentId) => {
     try {
-      // For now, rejecting a payment just removes it from the view
-      // In a real implementation, this would call a backend endpoint
-      toast.info('Pago rechazado. Se recargará la información.')
+      const customerId = Number(debtorId)
+
+      // Find the debtor and payment
+      const debtor = debtors.find((d) => d.id === customerId)
+      if (!debtor) {
+        toast.error('Deudor no encontrado')
+        return
+      }
+
+      const payment = debtor.payments.find((p) => p.id === paymentId)
+      if (!payment) {
+        toast.error('Pago no encontrado')
+        return
+      }
+
+      // Si el pago tiene un debtId, eliminar la deuda para rechazar el pago
+      if (payment.debtId) {
+        // Al eliminar la deuda, el pago pendiente desaparece
+        await deleteDebt(payment.debtId)
+        console.log('🗑️ Pago rechazado y eliminado:', payment)
+        toast.success('Pago rechazado exitosamente')
+      } else {
+        toast.error('No se puede rechazar: pago sin ID de deuda')
+      }
+
       await loadData()
     } catch (error) {
       console.error('Error rejecting payment:', error)

@@ -54,6 +54,12 @@ export function Login() {
 
   const handleChange = (field, value) => {
     setFormData({ ...formData, [field]: value })
+    // Limpiar error de submit cuando el usuario empieza a escribir
+    if (errors.submit) {
+      const newErrors = { ...errors }
+      delete newErrors.submit
+      setErrors(newErrors)
+    }
     if (touched[field]) {
       validateField(field, value)
     }

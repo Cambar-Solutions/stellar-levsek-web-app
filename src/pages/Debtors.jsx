@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDebt } from '../contexts/DebtContext'
+import { useConfirm } from '../hooks/useConfirm'
 import { Layout } from '../components/Layout'
 import { Card, CardContent, CardHeader } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
@@ -18,6 +19,7 @@ import toast from 'react-hot-toast'
 
 export function Debtors() {
   const { debtors, deleteDebtor } = useDebt()
+  const { confirm, ConfirmDialog } = useConfirm()
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredDebtors = debtors.filter((debtor) =>
@@ -40,14 +42,38 @@ export function Debtors() {
     })
   }
 
-  const handleDelete = (id, name) => {
-    if (window.confirm(`¿Estás seguro de eliminar a ${name}?`)) {
-      deleteDebtor(id)
+  const canDeleteDebtor = (debtor) => {
+    // No se puede eliminar si tiene deudas pendientes o pagos registrados
+    return debtor.totalDebt === 0 && debtor.payments.length === 0
+  }
+
+  const handleDelete = async (id, name, debtor) => {
+    if (!canDeleteDebtor(debtor)) {
+      toast.error('No se puede eliminar un deudor con deudas o pagos registrados')
+      return
+    }
+
+    const confirmed = await confirm({
+      title: 'Eliminar deudor',
+      message: `¿Estás seguro de eliminar a ${name}? Esta acción no se puede deshacer.`,
+      type: 'danger',
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar'
+    })
+
+    if (confirmed) {
+      try {
+        await deleteDebtor(id)
+      } catch (error) {
+        // El error ya se muestra en DebtContext, solo logueamos aquí
+        console.error('Error en handleDelete:', error)
+      }
     }
   }
 
   return (
     <Layout>
+      <ConfirmDialog />
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
@@ -118,14 +144,14 @@ export function Debtors() {
                 </div>
 
                 {/* Amount */}
-                <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 mb-4">
+                <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 mb-4">
                   <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Saldo Pendiente</p>
                   <p
                     className={`text-2xl font-bold ${
                       debtor.totalDebt > 4000
-                        ? 'text-red-600'
+                        ? 'text-red-600 dark:text-red-400'
                         : debtor.totalDebt > 2000
-                        ? 'text-orange-600'
+                        ? 'text-orange-600 dark:text-orange-400'
                         : 'text-gray-900 dark:text-white'
                     }`}
                   >
@@ -174,8 +200,18 @@ export function Debtors() {
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => handleDelete(debtor.id, debtor.name)}
-                    className="flex items-center gap-2"
+                    onClick={() => handleDelete(debtor.id, debtor.name, debtor)}
+                    disabled={!canDeleteDebtor(debtor)}
+                    className={`flex items-center gap-2 ${
+                      !canDeleteDebtor(debtor)
+                        ? 'opacity-50 cursor-not-allowed'
+                        : ''
+                    }`}
+                    title={
+                      !canDeleteDebtor(debtor)
+                        ? 'No se puede eliminar: tiene deudas o pagos registrados'
+                        : 'Eliminar deudor'
+                    }
                   >
                     <Trash2 size={16} />
                   </Button>

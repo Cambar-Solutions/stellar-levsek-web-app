@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useDebt } from '../contexts/DebtContext'
+import { useConfirm } from '../hooks/useConfirm'
 import { Layout } from '../components/Layout'
 import { Card, CardContent, CardHeader } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
@@ -27,6 +28,7 @@ export function DebtorDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { debtors, addPayment, approvePayment, rejectPayment } = useDebt()
+  const { confirm, ConfirmDialog } = useConfirm()
   const [paymentAmount, setPaymentAmount] = useState('')
   const [showPaymentForm, setShowPaymentForm] = useState(false)
 
@@ -88,14 +90,30 @@ export function DebtorDetail() {
     setShowPaymentForm(false)
   }
 
-  const handleApprovePayment = (paymentId) => {
-    if (window.confirm('¿Aprobar este pago?')) {
+  const handleApprovePayment = async (paymentId, amount) => {
+    const confirmed = await confirm({
+      title: 'Aprobar pago',
+      message: `¿Confirmas que quieres aprobar este pago de ${formatCurrency(amount)}?`,
+      type: 'success',
+      confirmText: 'Aprobar',
+      cancelText: 'Cancelar'
+    })
+
+    if (confirmed) {
       approvePayment(debtor.id, paymentId)
     }
   }
 
-  const handleRejectPayment = (paymentId) => {
-    if (window.confirm('¿Rechazar y eliminar este pago?')) {
+  const handleRejectPayment = async (paymentId) => {
+    const confirmed = await confirm({
+      title: 'Rechazar pago',
+      message: '¿Estás seguro de rechazar este pago? Esta acción no se puede deshacer.',
+      type: 'danger',
+      confirmText: 'Rechazar',
+      cancelText: 'Cancelar'
+    })
+
+    if (confirmed) {
       rejectPayment(debtor.id, paymentId)
     }
   }
@@ -106,6 +124,7 @@ export function DebtorDetail() {
 
   return (
     <Layout>
+      <ConfirmDialog />
       <div className="max-w-4xl mx-auto">
         <Button
           variant="ghost"
@@ -409,11 +428,11 @@ export function DebtorDetail() {
 
                     {/* Botones de aprobación/rechazo para pagos en revisión */}
                     {payment.status === 'reviewing' && (
-                      <div className="flex gap-2 mt-3 pt-3 border-t border-gray-200">
+                      <div className="flex gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                         <Button
                           variant="success"
                           size="sm"
-                          onClick={() => handleApprovePayment(payment.id)}
+                          onClick={() => handleApprovePayment(payment.id, payment.amount)}
                           className="flex-1 flex items-center justify-center gap-2"
                         >
                           <Check size={16} />
