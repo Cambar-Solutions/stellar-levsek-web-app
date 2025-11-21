@@ -1,4 +1,4 @@
-import { SoroswapSDK, SupportedNetworks } from '@soroswap/sdk'
+import { SoroswapSDK, SupportedNetworks, SupportedProtocols, TradeType } from '@soroswap/sdk'
 import {
   Horizon,
   rpc,
@@ -62,8 +62,8 @@ export async function getSwapQuote(tokenInAddress, tokenOutAddress, amount) {
       assetOut: tokenOutAddress,
       amount: amount,
       slippageBps: 500, // 5% slippage tolerance
-      tradeType: 'EXACT_IN',
-      protocols: ['soroswap'], // Specify protocol to use
+      tradeType: TradeType.EXACT_IN,
+      protocols: [SupportedProtocols.SOROSWAP], // Specify protocol to use
     })
 
     console.log('💰 Quote received:', {
@@ -107,8 +107,8 @@ export async function executeSwap(secretKey, tokenInAddress, tokenOutAddress, am
       assetOut: tokenOutAddress,
       amount: amount,
       slippageBps: 500, // 5% slippage
-      tradeType: 'EXACT_IN',
-      protocols: ['soroswap'], // Specify protocol to use
+      tradeType: TradeType.EXACT_IN,
+      protocols: [SupportedProtocols.SOROSWAP], // Specify protocol to use
     })
 
     console.log('💰 Quote:', {
