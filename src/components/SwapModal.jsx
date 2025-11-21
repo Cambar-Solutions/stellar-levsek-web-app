@@ -272,12 +272,12 @@ export function SwapModal({ isOpen, onClose, userSecretKey: providedSecretKey, o
                     <span
                       className={cn(
                         'font-medium',
-                        quote.priceImpactPct > 5
+                        Number(quote.priceImpactPct) > 5
                           ? 'text-red-600 dark:text-red-400'
                           : 'text-green-600 dark:text-green-400'
                       )}
                     >
-                      {quote.priceImpactPct.toFixed(2)}%
+                      {Number(quote.priceImpactPct).toFixed(2)}%
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -289,7 +289,7 @@ export function SwapModal({ isOpen, onClose, userSecretKey: providedSecretKey, o
             )}
 
             {/* Warning for high price impact */}
-            {quote && quote.priceImpactPct > 5 && (
+            {quote && Number(quote.priceImpactPct) > 5 && (
               <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
                 <div className="flex gap-3">
                   <svg
