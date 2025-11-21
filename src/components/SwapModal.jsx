@@ -124,9 +124,9 @@ export function SwapModal({ isOpen, onClose, userSecretKey: providedSecretKey, o
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md mx-4">
-        <Card>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="w-full max-w-md my-auto">
+        <Card className="max-h-[90vh] flex flex-col">
           <CardHeader className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Token Swap</h2>
             <button
@@ -149,7 +149,7 @@ export function SwapModal({ isOpen, onClose, userSecretKey: providedSecretKey, o
             </button>
           </CardHeader>
 
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 overflow-y-auto flex-1">
             {/* Secret Key Input */}
             {!providedSecretKey && (
               <div className="space-y-2">

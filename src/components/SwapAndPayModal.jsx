@@ -53,6 +53,13 @@ export function SwapAndPayModal({
         return
       }
 
+      // Check if trying to swap same token
+      if (selectedToken.address === TOKENS.USDC.address) {
+        setQuote(null)
+        setCost(null)
+        return
+      }
+
       try {
         setLoading(true)
 
@@ -138,9 +145,9 @@ export function SwapAndPayModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-lg mx-4">
-        <Card>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="w-full max-w-lg my-auto">
+        <Card className="max-h-[90vh] flex flex-col">
           <CardHeader className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -166,7 +173,7 @@ export function SwapAndPayModal({
             </button>
           </CardHeader>
 
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 overflow-y-auto flex-1">
             {/* Secret Key Input */}
             {!providedSecretKey && (
               <div className="space-y-2">
@@ -187,12 +194,12 @@ export function SwapAndPayModal({
             )}
 
             {/* Debt Amount Display */}
-            <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Debt Amount</div>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800">
+              <div className="text-xs text-gray-600 dark:text-gray-400">Debt Amount</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 ${debtAmount.toFixed(2)} USDC
               </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <div className="text-xs text-gray-500 dark:text-gray-400">
                 For: {debtorName}
               </div>
             </div>
@@ -219,8 +226,22 @@ export function SwapAndPayModal({
             </div>
 
             {/* Quote Display */}
-            {loading ? (
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+            {selectedToken?.address === TOKENS.USDC.address ? (
+              <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                <div className="flex gap-2">
+                  <AlertCircle className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-medium text-blue-900 dark:text-blue-200">
+                      No Swap Needed
+                    </p>
+                    <p className="text-xs text-blue-700 dark:text-blue-300 mt-0.5">
+                      You selected USDC, which is the same as the debt currency. Please use the regular payment button instead of Swap + Pay.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : loading ? (
+              <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
                 <div className="flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400">
                   <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                     <circle
@@ -243,24 +264,24 @@ export function SwapAndPayModal({
             ) : quote && cost ? (
               <>
                 {/* Swap Preview */}
-                <div className="p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="p-3 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                  <div className="flex items-center justify-between">
                     <div className="text-center flex-1">
-                      <div className="text-sm text-gray-600 dark:text-gray-400">You Pay</div>
-                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                      <div className="text-xs text-gray-600 dark:text-gray-400">You Pay</div>
+                      <div className="text-xl font-bold text-gray-900 dark:text-white">
                         {cost.tokenInAmount}
                       </div>
-                      <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                      <div className="text-xs font-medium text-gray-600 dark:text-gray-400">
                         {selectedToken.symbol}
                       </div>
                     </div>
-                    <ArrowRight className="w-6 h-6 text-gray-400 flex-shrink-0" />
+                    <ArrowRight className="w-5 h-5 text-gray-400 flex-shrink-0 mx-2" />
                     <div className="text-center flex-1">
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Debt Paid</div>
-                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Debt Paid</div>
+                      <div className="text-xl font-bold text-gray-900 dark:text-white">
                         {debtAmount.toFixed(2)}
                       </div>
-                      <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                      <div className="text-xs font-medium text-gray-600 dark:text-gray-400">
                         USDC
                       </div>
                     </div>
@@ -268,8 +289,8 @@ export function SwapAndPayModal({
                 </div>
 
                 {/* Cost Breakdown */}
-                <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
-                  <div className="space-y-2 text-sm">
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+                  <div className="space-y-1.5 text-xs">
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-400">Exchange Rate</span>
                       <span className="font-medium text-gray-900 dark:text-white">
@@ -317,16 +338,15 @@ export function SwapAndPayModal({
 
                 {/* High Price Impact Warning */}
                 {Number(quote.priceImpactPct) > 5 && (
-                  <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-                    <div className="flex gap-3">
-                      <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                    <div className="flex gap-2">
+                      <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+                        <p className="text-xs font-medium text-amber-900 dark:text-amber-200">
                           High Price Impact
                         </p>
-                        <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                          This swap will significantly impact the pool price. Consider paying
-                          directly with USDC if possible.
+                        <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">
+                          Consider paying directly with USDC if possible.
                         </p>
                       </div>
                     </div>
@@ -334,17 +354,17 @@ export function SwapAndPayModal({
                 )}
 
                 {/* How It Works */}
-                <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                  <div className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">
+                <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                  <div className="text-xs font-medium text-blue-900 dark:text-blue-200 mb-1">
                     How This Works:
                   </div>
-                  <ol className="text-sm text-blue-700 dark:text-blue-300 space-y-1 list-decimal list-inside">
+                  <ol className="text-xs text-blue-700 dark:text-blue-300 space-y-0.5 list-decimal list-inside">
                     <li>Swap {cost.tokenInAmount} {selectedToken.symbol} → {debtAmount.toFixed(2)} USDC</li>
                     <li>Pay {debtAmount.toFixed(2)} USDC to {debtorName}'s debt</li>
-                    <li>Transaction recorded on Stellar blockchain</li>
+                    <li>Recorded on Stellar blockchain</li>
                   </ol>
-                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
-                    All in one atomic transaction - either everything succeeds or nothing happens.
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                    ⚡ All in one atomic transaction
                   </p>
                 </div>
               </>
@@ -359,7 +379,7 @@ export function SwapAndPayModal({
               variant="primary"
               onClick={handlePay}
               className="flex-1"
-              disabled={!quote || paying || loading || !secretKey}
+              disabled={!quote || paying || loading || !secretKey || selectedToken?.address === TOKENS.USDC.address}
             >
               {paying ? (
                 <>

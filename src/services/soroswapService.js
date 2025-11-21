@@ -135,16 +135,43 @@ export async function executeSwap(secretKey, tokenInAddress, tokenOutAddress, am
     const result = await soroswapSDK.send(txXDR, false, SupportedNetworks.TESTNET)
 
     console.log('✅ Swap executed successfully:', result)
+    console.log('📝 Transaction hash:', result.hash || result.id || 'NO HASH')
+
+    // Extract hash from different possible properties
+    const txHash = result.hash || result.id || result.transactionHash || result.tx_hash
+
+    if (!txHash) {
+      console.warn('⚠️ No transaction hash returned, swap may still be successful')
+      // Return success without waiting for confirmation
+      return {
+        hash: 'pending',
+        status: 'PENDING',
+        amountIn: quote.amountIn.toString(),
+        amountOut: quote.amountOut.toString(),
+        priceImpactPct: quote.priceImpactPct,
+      }
+    }
 
     // Wait for confirmation
-    const confirmation = await waitForTransactionConfirmation(result.hash)
-
-    return {
-      hash: result.hash,
-      status: confirmation.status,
-      amountIn: quote.amountIn.toString(),
-      amountOut: quote.amountOut.toString(),
-      priceImpactPct: quote.priceImpactPct,
+    try {
+      const confirmation = await waitForTransactionConfirmation(txHash)
+      return {
+        hash: txHash,
+        status: confirmation.status,
+        amountIn: quote.amountIn.toString(),
+        amountOut: quote.amountOut.toString(),
+        priceImpactPct: quote.priceImpactPct,
+      }
+    } catch (confirmError) {
+      console.warn('⚠️ Could not confirm transaction, but swap may be successful:', confirmError)
+      // Return hash even if confirmation fails
+      return {
+        hash: txHash,
+        status: 'UNKNOWN',
+        amountIn: quote.amountIn.toString(),
+        amountOut: quote.amountOut.toString(),
+        priceImpactPct: quote.priceImpactPct,
+      }
     }
   } catch (error) {
     console.error('Error executing swap:', error)
@@ -199,6 +226,12 @@ export async function getTokenBalance(tokenAddress, userAddress) {
  */
 async function waitForTransactionConfirmation(txHash) {
   console.log('⏳ Waiting for transaction confirmation...')
+  console.log('🔑 Hash to check:', txHash)
+
+  // Validate hash exists and has content
+  if (!txHash || txHash === '' || txHash === 'undefined') {
+    throw new Error('Invalid transaction hash - cannot confirm')
+  }
 
   const maxAttempts = 30
   let attempts = 0
@@ -215,7 +248,10 @@ async function waitForTransactionConfirmation(txHash) {
       attempts++
       await new Promise((resolve) => setTimeout(resolve, 1000))
     } catch (error) {
-      console.error('Error checking transaction:', error)
+      // Only log error details if it's not the common "unexpected hash length" error
+      if (error.code !== -32602) {
+        console.error('Error checking transaction:', error)
+      }
       attempts++
       await new Promise((resolve) => setTimeout(resolve, 1000))
     }

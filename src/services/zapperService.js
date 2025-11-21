@@ -21,6 +21,11 @@ export async function getPaymentQuote(tokenInAddress, tokenOutAddress, targetAmo
       targetAmount,
     })
 
+    // Check if tokens are the same
+    if (tokenInAddress === tokenOutAddress) {
+      throw new Error('Cannot get quote for same token swap')
+    }
+
     // Convert target amount to stroops
     const targetStroops = parseTokenAmount(targetAmount)
 
@@ -84,6 +89,13 @@ export async function executeSwapAndPay(
       tokenIn: getTokenSymbol(tokenInAddress),
       tokenOut: getTokenSymbol(tokenOutAddress),
     })
+
+    // Check if tokens are the same - no swap needed
+    if (tokenInAddress === tokenOutAddress) {
+      throw new Error(
+        `Cannot swap same token. You selected ${getTokenSymbol(tokenInAddress)} to pay a ${getTokenSymbol(tokenOutAddress)} debt. Please pay directly instead of using Swap + Pay.`
+      )
+    }
 
     // Step 1: Get quote to know how much to swap
     const quote = await getPaymentQuote(tokenInAddress, tokenOutAddress, paymentAmount)
