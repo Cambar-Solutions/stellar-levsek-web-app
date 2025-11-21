@@ -14,6 +14,7 @@ import { Stats } from './pages/Stats'
 import { PendingPayments } from './pages/PendingPayments'
 import { PublicView } from './pages/PublicView'
 import { PublicPayment } from './pages/PublicPayment'
+import { Chatbot } from './components/Chatbot'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -178,6 +179,9 @@ function App() {
                 },
               }}
             />
+
+            {/* Chatbot - Floating AI Assistant */}
+            <Chatbot />
           </DebtProvider>
         </AuthProvider>
       </BrowserRouter>
