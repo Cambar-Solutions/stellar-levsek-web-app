@@ -88,38 +88,39 @@ export function Dashboard() {
 
       {/* Wallet Info */}
       <Card className="mb-8 bg-gradient-to-br from-blue-600 to-purple-700 border-0">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex flex-col gap-4">
             <div className="text-white">
-              <p className="text-sm font-medium text-blue-100 mb-1">
+              <p className="text-sm font-medium text-blue-100 mb-2">
                 Tu Wallet Stellar
               </p>
-              <div className="flex items-center gap-3">
-                <code className="text-lg font-mono font-semibold">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg p-3">
+                <code className="text-xs sm:text-sm font-mono font-semibold flex-1 break-all">
                   {user?.walletAddress}
                 </code>
                 <button
                   onClick={() => copyToClipboard(user?.walletAddress)}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-2 hover:bg-white/20 rounded-lg transition-colors flex-shrink-0"
+                  title="Copiar dirección"
                 >
                   <Copy size={18} />
                 </button>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button
                 variant="success"
                 size="sm"
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto"
                 onClick={() => setIsSwapModalOpen(true)}
               >
                 <ArrowLeftRight size={16} />
-                Swap Tokens
+                <span className="sm:inline">Swap Tokens</span>
               </Button>
-              <Link to={`/public/${user?.siteId}`}>
-                <Button variant="secondary" size="sm" className="flex items-center gap-2">
+              <Link to={`/public/${user?.siteId}`} className="w-full sm:w-auto">
+                <Button variant="secondary" size="sm" className="flex items-center justify-center gap-2 w-full">
                   <ExternalLink size={16} />
-                  Ver Vista Pública
+                  <span className="sm:inline">Vista Pública</span>
                 </Button>
               </Link>
             </div>
@@ -158,7 +159,8 @@ export function Dashboard() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200">
                 <tr>
@@ -249,6 +251,80 @@ export function Dashboard() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden p-4 space-y-4">
+            {filteredDebtors.length === 0 ? (
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+                No se encontraron deudores
+              </p>
+            ) : (
+              filteredDebtors.map((debtor) => (
+                <div
+                  key={debtor.id}
+                  className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 space-y-3"
+                >
+                  {/* Header */}
+                  <div className="flex items-center gap-3 pb-3 border-b border-gray-200 dark:border-gray-600">
+                    <Avatar name={debtor.name} />
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        {debtor.name}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{debtor.email}</p>
+                    </div>
+                    <Badge
+                      variant={
+                        debtor.status === 'verified'
+                          ? 'verified'
+                          : debtor.status === 'pending'
+                          ? 'pending'
+                          : 'default'
+                      }
+                    >
+                      {debtor.status === 'verified' ? 'Verificado' : 'Pendiente'}
+                    </Badge>
+                  </div>
+
+                  {/* Info */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Tipo de Cuenta</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {debtor.accountType}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Saldo Pendiente</span>
+                      <span
+                        className={`font-bold text-lg ${
+                          debtor.totalDebt > 4000
+                            ? 'text-red-600'
+                            : debtor.totalDebt > 2000
+                            ? 'text-orange-600'
+                            : 'text-gray-900 dark:text-white'
+                        }`}
+                      >
+                        {formatCurrency(debtor.totalDebt)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+                  <Link to={`/debtors/${debtor.id}`} className="block">
+                    <Button
+                      variant="warning"
+                      size="sm"
+                      className="w-full flex items-center justify-center gap-2"
+                    >
+                      <TrendingUp size={16} />
+                      Ver Detalle
+                    </Button>
+                  </Link>
+                </div>
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
