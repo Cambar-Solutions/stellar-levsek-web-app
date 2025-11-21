@@ -16,7 +16,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { getPublicSiteInfo, registerPayment, getDebtsByCustomer } from '../services/debtService'
+import { getPublicSiteInfo, getDebtsByCustomer, createPendingPayment } from '../services/debtService'
 
 export function PublicPayment() {
   const { siteId, debtorId: debtorIdParam } = useParams()
@@ -120,16 +120,24 @@ export function PublicPayment() {
           return
         }
 
-        // Registrar el pago en la deuda existente
-        await registerPayment(pendingDebt.id, {
+        // Crear pending payment (NO actualiza la deuda todavía)
+        await createPendingPayment({
+          debtId: pendingDebt.id,
+          customerId: debtor.id,
           amount: amount,
           paymentType: 'stellar',
-          notes: `Pago público desde Stellar - Ref: ${txReference} - TxHash: ${result.txHash}`
+          reference: txReference,
+          notes: `Pago público desde Stellar - TxHash: ${result.txHash}`,
+          stellarTxHash: result.txHash
         })
 
-        console.log('✅ Pago público registrado en el backend:', result.txHash)
+        console.log('✅ Pending payment creado en el backend:', result.txHash)
+
+        // Recargar datos para reflejar el nuevo estado
+        await loadPublicData()
+
         setPaymentSuccess(true)
-        toast.success('¡Pago registrado exitosamente!')
+        toast.success('¡Pago registrado exitosamente! Será revisado por el administrador.')
       }
     } catch (error) {
       console.error('Error al procesar el pago:', error)

@@ -112,3 +112,39 @@ export async function deleteCustomer(id) {
 export async function getPublicSiteInfo(siteId) {
   return await apiPublicGet(`/sites/public/${siteId}`)
 }
+
+/**
+ * Create pending payment (for public payments)
+ */
+export async function createPendingPayment(pendingPaymentData) {
+  return await apiPost(API_ENDPOINTS.PENDING_PAYMENTS, pendingPaymentData)
+}
+
+/**
+ * Get all pending payments
+ */
+export async function getAllPendingPayments(status) {
+  const endpoint = status ? `${API_ENDPOINTS.PENDING_PAYMENTS}?status=${status}` : API_ENDPOINTS.PENDING_PAYMENTS
+  return await apiGet(endpoint)
+}
+
+/**
+ * Get pending payments by customer
+ */
+export async function getPendingPaymentsByCustomer(customerId) {
+  return await apiGet(API_ENDPOINTS.PENDING_PAYMENTS_BY_CUSTOMER(customerId))
+}
+
+/**
+ * Approve pending payment
+ */
+export async function approvePendingPayment(id) {
+  return await apiPatch(API_ENDPOINTS.APPROVE_PENDING_PAYMENT(id), {})
+}
+
+/**
+ * Reject pending payment
+ */
+export async function rejectPendingPayment(id) {
+  return await apiPatch(API_ENDPOINTS.REJECT_PENDING_PAYMENT(id), {})
+}

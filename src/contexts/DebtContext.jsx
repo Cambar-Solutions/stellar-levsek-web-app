@@ -13,6 +13,9 @@ import {
   createCustomer,
   updateCustomer,
   deleteCustomer,
+  getAllPendingPayments,
+  approvePendingPayment,
+  rejectPendingPayment,
 } from '../services/debtService'
 
 const DebtContext = createContext(null)
@@ -36,15 +39,17 @@ export function DebtProvider({ children }) {
     try {
       setLoading(true)
 
-      // Load customers and debts from API
-      const [customersResponse, debtsResponse] = await Promise.all([
+      // Load customers, debts and pending payments from API
+      const [customersResponse, debtsResponse, pendingPaymentsResponse] = await Promise.all([
         getAllCustomers(),
         getAllDebts(),
+        getAllPendingPayments(),
       ])
 
       // Extract data from backend response wrapper { data: [...], status: 200, message: "success" }
       const customersData = customersResponse.data || customersResponse || []
       const debtsData = debtsResponse.data || debtsResponse || []
+      const pendingPaymentsData = pendingPaymentsResponse.data || pendingPaymentsResponse || []
 
       setCustomers(customersData)
       setDebts(debtsData)
@@ -112,17 +117,41 @@ export function DebtProvider({ children }) {
             debtor.status = 'pending'
           }
 
-          // Add payment info if exists
-          // Los pagos van como "reviewing" para que el admin los apruebe
-          // Solo se marcan como "verified" cuando la deuda está completamente pagada
-          if (paidAmount > 0) {
+        }
+      })
+
+      // Agregar pending payments como pagos "reviewing"
+      console.log('🔍 Processing pending payments:', pendingPaymentsData.length, 'pending payments')
+      pendingPaymentsData.forEach((pendingPayment) => {
+        if (debtorsMap.has(pendingPayment.customerId)) {
+          const debtor = debtorsMap.get(pendingPayment.customerId)
+
+          // Solo agregar pending payments con status 'pending' o 'approved'
+          // Los 'rejected' no se muestran
+          if (pendingPayment.status === 'pending') {
             debtor.payments.push({
-              id: `payment_${debt.id}`,
-              amount: paidAmount,
-              date: debt.updatedAt || debt.updated_at,
-              status: debt.status === 'paid' ? 'verified' : 'reviewing',
-              txHash: debt.stellarTxHash || debt.stellar_tx_hash || null,
-              debtId: debt.id,
+              id: `pending_${pendingPayment.id}`,
+              amount: Number(pendingPayment.amount),
+              date: pendingPayment.createdAt || pendingPayment.created_at,
+              status: 'reviewing',
+              txHash: pendingPayment.stellarTxHash || pendingPayment.stellar_tx_hash || 'N/A',
+              reference: pendingPayment.reference,
+              debtId: pendingPayment.debtId,
+              pendingPaymentId: pendingPayment.id, // Para poder aprobar/rechazar
+              publicPayment: true,
+            })
+          } else if (pendingPayment.status === 'approved') {
+            // Los pagos aprobados se muestran como "verified"
+            debtor.payments.push({
+              id: `approved_${pendingPayment.id}`,
+              amount: Number(pendingPayment.amount),
+              date: pendingPayment.updatedAt || pendingPayment.updated_at,
+              status: 'verified',
+              txHash: pendingPayment.stellarTxHash || pendingPayment.stellar_tx_hash || 'N/A',
+              reference: pendingPayment.reference,
+              debtId: pendingPayment.debtId,
+              pendingPaymentId: pendingPayment.id,
+              publicPayment: true,
             })
           }
         }
@@ -301,17 +330,22 @@ export function DebtProvider({ children }) {
         return
       }
 
-      // Actualizar el estado de la deuda a "paid" (pagada)
-      // NO usar approvePaymentAPI porque eso crea un pago duplicado
-      if (payment.debtId) {
-        // Solo actualizar el status de la deuda a "paid"
+      // Verificar si tiene pendingPaymentId (nuevo flujo) o debtId (flujo antiguo)
+      if (payment.pendingPaymentId) {
+        // Nuevo flujo: aprobar pending payment
+        await approvePendingPayment(payment.pendingPaymentId)
+        console.log('✅ Pending payment aprobado:', payment.pendingPaymentId)
+        toast.success('Pago aprobado exitosamente')
+      } else if (payment.debtId) {
+        // Flujo antiguo: actualizar el status de la deuda
         await updateDebt(payment.debtId, {
           status: 'paid'
         })
         console.log('✅ Pago aprobado, deuda marcada como pagada:', payment)
         toast.success('Pago aprobado exitosamente')
       } else {
-        toast.error('No se puede aprobar: pago sin ID de deuda')
+        toast.error('No se puede aprobar: pago sin ID válido')
+        return
       }
 
       // Recargar datos para reflejar cambios
@@ -339,14 +373,20 @@ export function DebtProvider({ children }) {
         return
       }
 
-      // Si el pago tiene un debtId, eliminar la deuda para rechazar el pago
-      if (payment.debtId) {
-        // Al eliminar la deuda, el pago pendiente desaparece
+      // Verificar si tiene pendingPaymentId (nuevo flujo)
+      if (payment.pendingPaymentId) {
+        // Nuevo flujo: rechazar pending payment (NO toca la deuda)
+        await rejectPendingPayment(payment.pendingPaymentId)
+        console.log('🗑️ Pending payment rechazado:', payment.pendingPaymentId)
+        toast.success('Pago rechazado exitosamente')
+      } else if (payment.debtId) {
+        // Flujo antiguo: eliminar la deuda (PELIGROSO - solo para backward compatibility)
         await deleteDebt(payment.debtId)
-        console.log('🗑️ Pago rechazado y eliminado:', payment)
+        console.log('🗑️ Pago rechazado y deuda eliminada (flujo antiguo):', payment)
         toast.success('Pago rechazado exitosamente')
       } else {
-        toast.error('No se puede rechazar: pago sin ID de deuda')
+        toast.error('No se puede rechazar: pago sin ID válido')
+        return
       }
 
       await loadData()
@@ -381,6 +421,7 @@ export function DebtProvider({ children }) {
         approvePayment,
         rejectPayment,
         getStats,
+        reloadData: loadData,
       }}
     >
       {children}

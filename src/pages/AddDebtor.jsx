@@ -12,7 +12,7 @@ import toast from 'react-hot-toast'
 
 export function AddDebtor() {
   const navigate = useNavigate()
-  const { addDebtor } = useDebt()
+  const { addDebtor, reloadData } = useDebt()
   const { user } = useAuth()
   const [customers, setCustomers] = useState([])
   const [mode, setMode] = useState('select') // 'select' or 'new'
@@ -80,6 +80,8 @@ export function AddDebtor() {
             totalAmount: debtAmount,
             description: formData.description || 'Deuda registrada',
           })
+          // Recargar datos para reflejar la nueva deuda
+          await reloadData()
           toast.success('Deuda registrada exitosamente')
         } else {
           toast.info('Cliente seleccionado (sin deuda nueva)')
