@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useDebt } from '../contexts/DebtContext'
 import { useConfirm } from '../hooks/useConfirm'
+import { useAuth } from '../contexts/AuthContext'
 import { Layout } from '../components/Layout'
 import { Card, CardContent, CardHeader } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Input, Label } from '../components/ui/Input'
 import { Badge } from '../components/ui/Badge'
 import { Avatar } from '../components/ui/Avatar'
+import { SwapAndPayModal } from '../components/SwapAndPayModal'
 import {
   ArrowLeft,
   DollarSign,
@@ -21,16 +23,19 @@ import {
   AlertCircle,
   Check,
   X,
+  Zap,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export function DebtorDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { debtors, addPayment, approvePayment, rejectPayment } = useDebt()
+  const { user } = useAuth()
+  const { debtors, addPayment, approvePayment, rejectPayment, reloadData } = useDebt()
   const { confirm, ConfirmDialog } = useConfirm()
   const [paymentAmount, setPaymentAmount] = useState('')
   const [showPaymentForm, setShowPaymentForm] = useState(false)
+  const [isSwapAndPayOpen, setIsSwapAndPayOpen] = useState(false)
 
   // Convert id from URL params to number for comparison
   const debtorId = Number(id)
@@ -207,17 +212,28 @@ export function DebtorDetail() {
           </Card>
         </div>
 
-        {/* Add Payment Button */}
+        {/* Add Payment Buttons */}
         {debtor.totalDebt > 0 && !showPaymentForm && (
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={() => setShowPaymentForm(true)}
-            className="w-full mb-6"
-          >
-            <DollarSign size={20} />
-            Registrar Pago
-          </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => setShowPaymentForm(true)}
+              className="w-full"
+            >
+              <DollarSign size={20} />
+              Registrar Pago Tradicional
+            </Button>
+            <Button
+              variant="success"
+              size="lg"
+              onClick={() => setIsSwapAndPayOpen(true)}
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+            >
+              <Zap size={20} />
+              Swap + Pay (Cualquier Token)
+            </Button>
+          </div>
         )}
 
         {/* Payment Form */}
@@ -455,6 +471,22 @@ export function DebtorDetail() {
             )}
           </CardContent>
         </Card>
+
+        {/* Swap + Pay Modal */}
+        <SwapAndPayModal
+          isOpen={isSwapAndPayOpen}
+          onClose={() => setIsSwapAndPayOpen(false)}
+          debtId={debtor.debts && debtor.debts.length > 0 ? debtor.debts[0].id : null}
+          debtAmount={debtor.totalDebt}
+          debtorName={debtor.name}
+          userSecretKey={user?.secretKey}
+          onPaymentComplete={(result) => {
+            console.log('Swap + Pay completed:', result)
+            toast.success(`Payment processed! Tx: ${result.swap.hash.substring(0, 8)}...`)
+            // Reload debt data
+            reloadData()
+          }}
+        />
       </div>
     </Layout>
   )
