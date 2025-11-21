@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { Badge } from '../components/ui/Badge'
 import { Avatar } from '../components/ui/Avatar'
+import { SwapModal } from '../components/SwapModal'
 import {
   Search,
   Plus,
@@ -18,6 +19,7 @@ import {
   Clock,
   ExternalLink,
   Copy,
+  ArrowLeftRight,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -25,6 +27,7 @@ export function Dashboard() {
   const { user } = useAuth()
   const { debtors, getStats } = useDebt()
   const [searchQuery, setSearchQuery] = useState('')
+  const [isSwapModalOpen, setIsSwapModalOpen] = useState(false)
   const stats = getStats()
 
   const filteredDebtors = debtors.filter((debtor) =>
@@ -103,12 +106,23 @@ export function Dashboard() {
                 </button>
               </div>
             </div>
-            <Link to={`/public/${user?.siteId}`}>
-              <Button variant="secondary" size="sm" className="flex items-center gap-2">
-                <ExternalLink size={16} />
-                Ver Vista Pública
+            <div className="flex gap-3">
+              <Button
+                variant="success"
+                size="sm"
+                className="flex items-center gap-2"
+                onClick={() => setIsSwapModalOpen(true)}
+              >
+                <ArrowLeftRight size={16} />
+                Swap Tokens
               </Button>
-            </Link>
+              <Link to={`/public/${user?.siteId}`}>
+                <Button variant="secondary" size="sm" className="flex items-center gap-2">
+                  <ExternalLink size={16} />
+                  Ver Vista Pública
+                </Button>
+              </Link>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -238,6 +252,17 @@ export function Dashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Swap Modal */}
+      <SwapModal
+        isOpen={isSwapModalOpen}
+        onClose={() => setIsSwapModalOpen(false)}
+        userSecretKey={user?.secretKey}
+        onSwapComplete={(result) => {
+          console.log('Swap completed:', result)
+          toast.success(`Swapped ${result.amountIn} ${result.tokenIn} for ${result.amountOut} ${result.tokenOut}`)
+        }}
+      />
     </Layout>
   )
 }
