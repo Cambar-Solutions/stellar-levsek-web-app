@@ -63,6 +63,7 @@ export async function getSwapQuote(tokenInAddress, tokenOutAddress, amount) {
       amount: amount,
       slippageBps: 500, // 5% slippage tolerance
       tradeType: 'EXACT_IN',
+      protocols: ['soroswap'], // Specify protocol to use
     })
 
     console.log('💰 Quote received:', {
@@ -107,6 +108,7 @@ export async function executeSwap(secretKey, tokenInAddress, tokenOutAddress, am
       amount: amount,
       slippageBps: 500, // 5% slippage
       tradeType: 'EXACT_IN',
+      protocols: ['soroswap'], // Specify protocol to use
     })
 
     console.log('💰 Quote:', {
