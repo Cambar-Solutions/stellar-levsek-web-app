@@ -28,4 +28,10 @@ export const API_ENDPOINTS = {
   DEBTS_BY_SITE: (siteId) => `/debts/site/${siteId}`,
   DEBTS_BY_CUSTOMER: (customerId) => `/debts/customer/${customerId}`,
   REGISTER_PAYMENT: (id) => `/debts/${id}/pay`,
+
+  // Pending Payments
+  PENDING_PAYMENTS: '/pending-payments',
+  PENDING_PAYMENTS_BY_CUSTOMER: (customerId) => `/pending-payments/customer/${customerId}`,
+  APPROVE_PENDING_PAYMENT: (id) => `/pending-payments/${id}/approve`,
+  REJECT_PENDING_PAYMENT: (id) => `/pending-payments/${id}/reject`,
 }
