@@ -125,16 +125,15 @@ export async function executeSwapAndPay(
     // Step 3: Register payment with the backend
     console.log('💳 Registering payment...')
 
+    // Build detailed notes with swap information
+    const detailedNotes = options.notes ||
+      `Swap + Pay: ${formatTokenAmount(quote.tokenInAmount)} ${quote.tokenInSymbol} → ${formatTokenAmount(swapResult.amountOut)} ${quote.tokenOutSymbol}` +
+      (swapResult.hash && swapResult.hash !== 'pending' ? ` | Tx: ${swapResult.hash.substring(0, 8)}...` : '')
+
     const paymentPayload = {
       amount: parseFloat(formatTokenAmount(swapResult.amountOut)),
       paymentType: options.paymentType || 'crypto',
-      notes: options.notes || `Paid with ${quote.tokenInSymbol} via Swap + Pay`,
-      // Additional metadata for tracking
-      swapTxHash: swapResult.hash,
-      originalToken: quote.tokenInSymbol,
-      originalAmount: formatTokenAmount(quote.tokenInAmount),
-      swappedToken: quote.tokenOutSymbol,
-      swappedAmount: formatTokenAmount(swapResult.amountOut),
+      notes: detailedNotes,
     }
 
     const paymentResult = await registerPayment(debtId, paymentPayload)
