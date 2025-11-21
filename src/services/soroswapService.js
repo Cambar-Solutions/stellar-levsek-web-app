@@ -1,6 +1,7 @@
 import { SoroswapSDK, SupportedNetworks } from '@soroswap/sdk'
 import {
-  Server as HorizonServer,
+  Horizon,
+  rpc,
   Networks,
   TransactionBuilder,
   Keypair,
@@ -8,7 +9,6 @@ import {
   Address,
   scValToNative,
 } from '@stellar/stellar-sdk'
-import { Server as SorobanServer } from '@stellar/stellar-sdk/rpc'
 
 // Network Configuration
 const TESTNET_HORIZON_URL = 'https://horizon-testnet.stellar.org'
@@ -32,8 +32,8 @@ export const TOKENS = {
 }
 
 // Initialize servers
-const horizonServer = new HorizonServer(TESTNET_HORIZON_URL)
-const sorobanServer = new SorobanServer(TESTNET_SOROBAN_URL)
+const horizonServer = new Horizon.Server(TESTNET_HORIZON_URL)
+const sorobanServer = new rpc.Server(TESTNET_SOROBAN_URL)
 
 // Initialize Soroswap SDK
 const soroswapSDK = new SoroswapSDK({
