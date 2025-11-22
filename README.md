@@ -1,4 +1,4 @@
-# ISIS - Sistema de Gestión Transparente de Deudas con Blockchain
+# ISIS - Intelligent System for Income & Spending
 
 <div align="center">
 

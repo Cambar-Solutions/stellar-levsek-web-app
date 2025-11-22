@@ -118,7 +118,7 @@ export function Login() {
             </div>
 
             <h1 className="text-5xl font-bold leading-tight">
-              Gestión Transparente de Deudas
+              Intelligent System for Income & Spending
             </h1>
 
             <p className="text-xl text-blue-100">
