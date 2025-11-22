@@ -313,87 +313,67 @@ export function DebtProvider({ children }) {
   }
 
   const approvePayment = async (debtorId, paymentId) => {
-    try {
-      // Normalize debtorId to number
-      const customerId = Number(debtorId)
+    // Normalize debtorId to number
+    const customerId = Number(debtorId)
 
-      // Find the debtor and payment
-      const debtor = debtors.find((d) => d.id === customerId)
-      if (!debtor) {
-        toast.error('Deudor no encontrado')
-        return
-      }
-
-      const payment = debtor.payments.find((p) => p.id === paymentId)
-      if (!payment) {
-        toast.error('Pago no encontrado')
-        return
-      }
-
-      // Verificar si tiene pendingPaymentId (nuevo flujo) o debtId (flujo antiguo)
-      if (payment.pendingPaymentId) {
-        // Nuevo flujo: aprobar pending payment
-        await approvePendingPayment(payment.pendingPaymentId)
-        console.log('✅ Pending payment aprobado:', payment.pendingPaymentId)
-        toast.success('Pago aprobado exitosamente')
-      } else if (payment.debtId) {
-        // Flujo antiguo: actualizar el status de la deuda
-        await updateDebt(payment.debtId, {
-          status: 'paid'
-        })
-        console.log('✅ Pago aprobado, deuda marcada como pagada:', payment)
-        toast.success('Pago aprobado exitosamente')
-      } else {
-        toast.error('No se puede aprobar: pago sin ID válido')
-        return
-      }
-
-      // Recargar datos para reflejar cambios
-      await loadData()
-    } catch (error) {
-      console.error('Error approving payment:', error)
-      toast.error(error.message || 'Error al aprobar pago')
+    // Find the debtor and payment
+    const debtor = debtors.find((d) => d.id === customerId)
+    if (!debtor) {
+      throw new Error('Deudor no encontrado')
     }
+
+    const payment = debtor.payments.find((p) => p.id === paymentId)
+    if (!payment) {
+      throw new Error('Pago no encontrado')
+    }
+
+    // Verificar si tiene pendingPaymentId (nuevo flujo) o debtId (flujo antiguo)
+    if (payment.pendingPaymentId) {
+      // Nuevo flujo: aprobar pending payment
+      await approvePendingPayment(payment.pendingPaymentId)
+      console.log('✅ Pending payment aprobado:', payment.pendingPaymentId)
+    } else if (payment.debtId) {
+      // Flujo antiguo: actualizar el status de la deuda
+      await updateDebt(payment.debtId, {
+        status: 'paid'
+      })
+      console.log('✅ Pago aprobado, deuda marcada como pagada:', payment)
+    } else {
+      throw new Error('No se puede aprobar: pago sin ID válido')
+    }
+
+    // Recargar datos para reflejar cambios
+    await loadData()
   }
 
   const rejectPayment = async (debtorId, paymentId) => {
-    try {
-      const customerId = Number(debtorId)
+    const customerId = Number(debtorId)
 
-      // Find the debtor and payment
-      const debtor = debtors.find((d) => d.id === customerId)
-      if (!debtor) {
-        toast.error('Deudor no encontrado')
-        return
-      }
-
-      const payment = debtor.payments.find((p) => p.id === paymentId)
-      if (!payment) {
-        toast.error('Pago no encontrado')
-        return
-      }
-
-      // Verificar si tiene pendingPaymentId (nuevo flujo)
-      if (payment.pendingPaymentId) {
-        // Nuevo flujo: rechazar pending payment (NO toca la deuda)
-        await rejectPendingPayment(payment.pendingPaymentId)
-        console.log('🗑️ Pending payment rechazado:', payment.pendingPaymentId)
-        toast.success('Pago rechazado exitosamente')
-      } else if (payment.debtId) {
-        // Flujo antiguo: eliminar la deuda (PELIGROSO - solo para backward compatibility)
-        await deleteDebt(payment.debtId)
-        console.log('🗑️ Pago rechazado y deuda eliminada (flujo antiguo):', payment)
-        toast.success('Pago rechazado exitosamente')
-      } else {
-        toast.error('No se puede rechazar: pago sin ID válido')
-        return
-      }
-
-      await loadData()
-    } catch (error) {
-      console.error('Error rejecting payment:', error)
-      toast.error(error.message || 'Error al rechazar pago')
+    // Find the debtor and payment
+    const debtor = debtors.find((d) => d.id === customerId)
+    if (!debtor) {
+      throw new Error('Deudor no encontrado')
     }
+
+    const payment = debtor.payments.find((p) => p.id === paymentId)
+    if (!payment) {
+      throw new Error('Pago no encontrado')
+    }
+
+    // Verificar si tiene pendingPaymentId (nuevo flujo)
+    if (payment.pendingPaymentId) {
+      // Nuevo flujo: rechazar pending payment (NO toca la deuda)
+      await rejectPendingPayment(payment.pendingPaymentId)
+      console.log('🗑️ Pending payment rechazado:', payment.pendingPaymentId)
+    } else if (payment.debtId) {
+      // Flujo antiguo: eliminar la deuda (PELIGROSO - solo para backward compatibility)
+      await deleteDebt(payment.debtId)
+      console.log('🗑️ Pago rechazado y deuda eliminada (flujo antiguo):', payment)
+    } else {
+      throw new Error('No se puede rechazar: pago sin ID válido')
+    }
+
+    await loadData()
   }
 
   const getStats = () => {
