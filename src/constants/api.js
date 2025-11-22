@@ -34,4 +34,9 @@ export const API_ENDPOINTS = {
   PENDING_PAYMENTS_BY_CUSTOMER: (customerId) => `/pending-payments/customer/${customerId}`,
   APPROVE_PENDING_PAYMENT: (id) => `/pending-payments/${id}/approve`,
   REJECT_PENDING_PAYMENT: (id) => `/pending-payments/${id}/reject`,
+
+  // ZK Proofs
+  ZK_STELLAR_PRICE: '/zkproof/stellar-price',
+  ZK_EXCHANGE_RATE: '/zkproof/exchange-rate',
+  ZK_HEALTH: '/zkproof/health',
 }

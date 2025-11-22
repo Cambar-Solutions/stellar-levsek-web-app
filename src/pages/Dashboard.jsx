@@ -9,6 +9,7 @@ import { Input } from '../components/ui/Input'
 import { Badge } from '../components/ui/Badge'
 import { Avatar } from '../components/ui/Avatar'
 import { SwapModal } from '../components/SwapModal'
+import { VerifiedXLMPrice } from '../components/VerifiedXLMPrice'
 import {
   Search,
   Plus,
@@ -84,6 +85,11 @@ export function Dashboard() {
           icon={<CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" />}
           color="green"
         />
+      </div>
+
+      {/* Verified XLM Price */}
+      <div className="mb-6 sm:mb-8">
+        <VerifiedXLMPrice />
       </div>
 
       {/* Wallet Info */}
