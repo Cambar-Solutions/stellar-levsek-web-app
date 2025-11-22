@@ -27,13 +27,27 @@ export function VerifiedXLMPrice({ className }) {
       setError(null)
       const response = await getStellarPrice()
 
-      if (response.success) {
-        setPriceData(response.data)
+      console.log('📊 VerifiedXLMPrice - Full response:', response)
+
+      // Handle wrapped response from production API
+      // Production wraps responses as: { data: {...}, status: 200, message: "success" }
+      const unwrappedResponse = response.data || response
+
+      console.log('📊 VerifiedXLMPrice - Unwrapped response:', unwrappedResponse)
+      console.log('📊 VerifiedXLMPrice - unwrappedResponse.success:', unwrappedResponse.success)
+      console.log('📊 VerifiedXLMPrice - unwrappedResponse.data:', unwrappedResponse.data)
+
+      if (unwrappedResponse.success) {
+        // Set the actual price data (unwrappedResponse.data contains price, timestamp, source)
+        setPriceData(unwrappedResponse.data)
+        console.log('✅ Price data set successfully:', unwrappedResponse.data)
       } else {
-        setError(response.error || 'Failed to load price')
+        const errorMsg = unwrappedResponse.error || unwrappedResponse.message || 'Failed to load price'
+        console.error('❌ Error in response:', errorMsg)
+        setError(errorMsg)
       }
     } catch (err) {
-      console.error('Error loading Stellar price:', err)
+      console.error('❌ Error loading Stellar price:', err)
       setError('Failed to connect to proof service')
     } finally {
       setLoading(false)
