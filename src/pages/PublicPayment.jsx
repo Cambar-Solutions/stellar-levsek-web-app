@@ -182,29 +182,54 @@ export function PublicPayment() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
         <Card className="max-w-2xl w-full">
           <CardContent className="p-12 text-center">
-            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
               <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
-              ¡Pago Registrado!
+              ¡Pago Registrado Exitosamente!
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
               Tu pago de <span className="font-bold text-green-600 dark:text-green-400">{formatCurrency(parseFloat(paymentAmount))}</span> ha sido
-              registrado exitosamente en la blockchain de Stellar
+              registrado en la blockchain de Stellar
             </p>
+
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 mb-6">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400 mb-1">Monto pagado</p>
+                  <p className="font-bold text-gray-900 dark:text-white">{formatCurrency(parseFloat(paymentAmount))}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400 mb-1">Deuda restante estimada</p>
+                  <p className="font-bold text-gray-900 dark:text-white">{formatCurrency(debtor.totalDebt - parseFloat(paymentAmount))}</p>
+                </div>
+              </div>
+            </div>
 
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 mb-8 text-left">
               <div className="flex items-start gap-3">
                 <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm text-blue-900 dark:text-blue-200 font-semibold mb-2">
-                    Próximos pasos:
+                    ¿Qué sigue?
                   </p>
-                  <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
-                    <li>• Tu pago está ahora <strong>en revisión</strong></li>
-                    <li>• El administrador de {businessData.name} lo verificará</li>
-                    <li>• Recibirás confirmación una vez aprobado</li>
-                    <li>• El saldo se actualizará automáticamente</li>
+                  <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 dark:text-blue-400">1.</span>
+                      <span>Tu pago está ahora <strong>en revisión</strong> por el equipo de {businessData.name}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 dark:text-blue-400">2.</span>
+                      <span>El administrador verificará la transacción en la blockchain</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 dark:text-blue-400">3.</span>
+                      <span>Una vez aprobado, tu deuda se actualizará automáticamente</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 dark:text-blue-400">4.</span>
+                      <span>Tiempo estimado de revisión: <strong>24-48 horas</strong></span>
+                    </li>
                   </ul>
                 </div>
               </div>

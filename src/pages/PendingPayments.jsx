@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useDebt } from '../contexts/DebtContext'
 import { useConfirm } from '../hooks/useConfirm'
 import { Layout } from '../components/Layout'
@@ -14,12 +15,38 @@ import {
   User,
   Calendar,
   AlertCircle,
+  RefreshCw,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export function PendingPayments() {
-  const { debtors, approvePayment, rejectPayment } = useDebt()
+  const { debtors, approvePayment, rejectPayment, reloadData } = useDebt()
   const { confirm, ConfirmDialog } = useConfirm()
+  const [lastUpdate, setLastUpdate] = useState(new Date())
+  const [nextRefresh, setNextRefresh] = useState(30)
+
+  // Auto-refresh cada 30 segundos para detectar nuevos pagos pendientes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      reloadData()
+      setLastUpdate(new Date())
+      setNextRefresh(30)
+    }, 30000) // 30 segundos
+
+    return () => clearInterval(interval)
+  }, [reloadData])
+
+  // Contador regresivo para próxima actualización
+  useEffect(() => {
+    const countdown = setInterval(() => {
+      setNextRefresh((prev) => {
+        if (prev <= 1) return 30
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(countdown)
+  }, [])
 
   // Obtener todos los pagos pendientes de revisión
   const pendingPayments = debtors
@@ -65,7 +92,18 @@ export function PendingPayments() {
     })
 
     if (confirmed) {
-      approvePayment(debtorId, paymentId)
+      try {
+        await toast.promise(
+          approvePayment(debtorId, paymentId),
+          {
+            loading: 'Aprobando pago y actualizando deuda...',
+            success: '¡Pago aprobado! La deuda ha sido actualizada correctamente.',
+            error: 'Error al aprobar el pago'
+          }
+        )
+      } catch (error) {
+        console.error('Error approving payment:', error)
+      }
     }
   }
 
@@ -79,8 +117,39 @@ export function PendingPayments() {
     })
 
     if (confirmed) {
-      rejectPayment(debtorId, paymentId)
+      try {
+        await toast.promise(
+          rejectPayment(debtorId, paymentId),
+          {
+            loading: 'Rechazando pago...',
+            success: 'Pago rechazado exitosamente',
+            error: 'Error al rechazar el pago'
+          }
+        )
+      } catch (error) {
+        console.error('Error rejecting payment:', error)
+      }
     }
+  }
+
+  const handleManualRefresh = async () => {
+    await toast.promise(
+      reloadData(),
+      {
+        loading: 'Actualizando datos...',
+        success: 'Datos actualizados',
+        error: 'Error al actualizar'
+      }
+    )
+    setLastUpdate(new Date())
+    setNextRefresh(30)
+  }
+
+  const formatLastUpdate = () => {
+    const seconds = Math.floor((new Date() - lastUpdate) / 1000)
+    if (seconds < 60) return `hace ${seconds}s`
+    const minutes = Math.floor(seconds / 60)
+    return `hace ${minutes}m`
   }
 
   return (
@@ -88,17 +157,30 @@ export function PendingPayments() {
       <ConfirmDialog />
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-            <Clock className="w-6 h-6 text-orange-600" />
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
+              <Clock className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Pagos Pendientes de Revisión
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                Última actualización: {formatLastUpdate()} • Próxima en {nextRefresh}s
+              </p>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Pagos Pendientes de Revisión
-          </h1>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleManualRefresh}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Actualizar
+          </Button>
         </div>
-        <p className="text-gray-600 dark:text-gray-300">
-          Revisa y aprueba los pagos realizados por tus deudores
-        </p>
       </div>
 
       {/* Alert */}

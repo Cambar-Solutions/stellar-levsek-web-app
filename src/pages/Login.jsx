@@ -156,7 +156,7 @@ export function Login() {
                   className="w-20 h-20 object-contain"
                 />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Bienvenido a ISIS</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Bienvenido</h2>
               <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Inicia sesión en tu cuenta</p>
             </div>
 
