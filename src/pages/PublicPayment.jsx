@@ -254,15 +254,15 @@ export function PublicPayment() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="relative">
-            <div className="w-24 h-24 border-4 border-purple-200 dark:border-purple-800 border-t-purple-600 dark:border-t-purple-400 rounded-full animate-spin mx-auto mb-6"></div>
+            <div className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-purple-200 dark:border-purple-800 border-t-purple-600 dark:border-t-purple-400 rounded-full animate-spin mx-auto mb-6"></div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <Loader2 className="w-10 h-10 text-purple-600 dark:text-purple-400 animate-pulse" />
+              <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600 dark:text-purple-400 animate-pulse" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 animate-pulse">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2 animate-pulse">
             Cargando información de pago...
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
             Conectando con Stellar Blockchain
           </p>
         </div>
@@ -274,12 +274,12 @@ export function PublicPayment() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
         <Card className="max-w-md w-full">
-          <CardContent className="p-12 text-center">
-            <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <AlertCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
+          <CardContent className="p-6 sm:p-8 md:p-12 text-center">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+              <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-red-600 dark:text-red-400" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Deudor no encontrado</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">No se pudo cargar la información del deudor.</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Deudor no encontrado</h2>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">No se pudo cargar la información del deudor.</p>
             <Button onClick={() => navigate(`/public/${siteId}`)} variant="primary" className="mx-auto">
               Volver al Registro Público
             </Button>
@@ -293,87 +293,87 @@ export function PublicPayment() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
         <Card className="max-w-3xl w-full shadow-2xl">
-          <CardContent className="p-12 text-center">
-            <div className="w-28 h-28 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl animate-bounce">
-              <CheckCircle2 className="w-16 h-16 text-white" />
+          <CardContent className="p-6 sm:p-8 md:p-12 text-center">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-2xl animate-bounce">
+              <CheckCircle2 className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-white" />
             </div>
 
-            <div className="mb-8">
-              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
                 ¡Pago Registrado Exitosamente! 🎉
               </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-300">
+              <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300">
                 Tu pago de <span className="font-bold text-green-600 dark:text-green-400">{formatCurrency(parseFloat(paymentAmount))}</span> ha sido
                 registrado en la blockchain de Stellar
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
               <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-2">
-                    <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
-                    <p className="text-sm font-semibold text-green-700 dark:text-green-300">Monto Pagado</p>
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                    <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
+                    <p className="text-xs sm:text-sm font-semibold text-green-700 dark:text-green-300">Monto Pagado</p>
                   </div>
-                  <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400">
                     {formatCurrency(parseFloat(paymentAmount))}
                   </p>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-blue-200 dark:border-blue-700">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-2">
-                    <TrendingDown className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                    <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">Deuda Restante (estimada)</p>
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                    <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+                    <p className="text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-300">Deuda Restante (estimada)</p>
                   </div>
-                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">
                     {formatCurrency(debtor.totalDebt - parseFloat(paymentAmount))}
                   </p>
                 </CardContent>
               </Card>
             </div>
 
-            <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-700 mb-8">
-              <CardContent className="p-6 text-left">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Info className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+            <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-700 mb-6 sm:mb-8">
+              <CardContent className="p-4 sm:p-6 text-left">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Info className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600 dark:text-indigo-400" />
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-indigo-900 dark:text-indigo-100 mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base sm:text-lg font-bold text-indigo-900 dark:text-indigo-100 mb-2 sm:mb-3">
                       ¿Qué sigue ahora?
                     </h3>
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-indigo-200 dark:bg-indigo-800 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-sm font-bold text-indigo-700 dark:text-indigo-300">1</span>
+                    <div className="space-y-2 sm:space-y-3">
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-indigo-200 dark:bg-indigo-800 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300">1</span>
                         </div>
-                        <p className="text-indigo-800 dark:text-indigo-200 pt-1">
+                        <p className="text-xs sm:text-sm text-indigo-800 dark:text-indigo-200 pt-1">
                           Tu pago está ahora <strong className="text-indigo-900 dark:text-indigo-100">en revisión</strong> por el equipo de {businessData.name}
                         </p>
                       </div>
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-indigo-200 dark:bg-indigo-800 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-sm font-bold text-indigo-700 dark:text-indigo-300">2</span>
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-indigo-200 dark:bg-indigo-800 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300">2</span>
                         </div>
-                        <p className="text-indigo-800 dark:text-indigo-200 pt-1">
+                        <p className="text-xs sm:text-sm text-indigo-800 dark:text-indigo-200 pt-1">
                           El administrador verificará la transacción en la blockchain de Stellar
                         </p>
                       </div>
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-indigo-200 dark:bg-indigo-800 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-sm font-bold text-indigo-700 dark:text-indigo-300">3</span>
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-indigo-200 dark:bg-indigo-800 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300">3</span>
                         </div>
-                        <p className="text-indigo-800 dark:text-indigo-200 pt-1">
+                        <p className="text-xs sm:text-sm text-indigo-800 dark:text-indigo-200 pt-1">
                           Una vez aprobado, tu deuda se actualizará automáticamente en el sistema
                         </p>
                       </div>
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-green-500 dark:bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Check className="w-5 h-5 text-white" />
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-500 dark:bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Check className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                         </div>
-                        <p className="text-indigo-800 dark:text-indigo-200 pt-1">
+                        <p className="text-xs sm:text-sm text-indigo-800 dark:text-indigo-200 pt-1">
                           Tiempo estimado de revisión: <strong className="text-indigo-900 dark:text-indigo-100">24-48 horas</strong>
                         </p>
                       </div>
@@ -423,28 +423,28 @@ export function PublicPayment() {
       <div className="relative z-10">
         {/* Header */}
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
                 <button
                   onClick={() => navigate(`/public/${siteId}`)}
-                  className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors hover:scale-105"
+                  className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors hover:scale-105 flex-shrink-0"
                 >
-                  <ArrowLeft size={20} />
-                  <span className="font-medium">Volver</span>
+                  <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+                  <span className="font-medium text-sm sm:text-base">Volver</span>
                 </button>
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-xl">
-                  <ShieldCheck className="w-7 h-7 text-white" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0">
+                  <ShieldCheck className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate">
                     {businessData.name}
                   </h1>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Portal de Pagos Públicos</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">Portal de Pagos Públicos</p>
                 </div>
               </div>
-              <Badge variant="success" className="flex items-center gap-2 shadow-lg">
-                <ShieldCheck className="w-4 h-4" />
+              <Badge variant="success" className="flex items-center gap-2 shadow-lg text-xs sm:text-sm flex-shrink-0">
+                <ShieldCheck className="w-3 h-3 sm:w-4 sm:h-4" />
                 Pago Seguro
               </Badge>
             </div>
@@ -454,74 +454,74 @@ export function PublicPayment() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             {/* Debtor Info - 2/5 del espacio */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               <Card className="shadow-xl border-2 border-purple-200 dark:border-purple-800">
                 <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-b border-purple-200 dark:border-purple-800">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-purple-600" />
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                     Información del Deudor
                   </h3>
                 </CardHeader>
-                <CardContent className="p-6 space-y-6">
+                <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
                   {/* Avatar y nombre */}
-                  <div className="flex items-center gap-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-                    <div className="relative">
+                  <div className="flex items-center gap-3 sm:gap-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                    <div className="relative flex-shrink-0">
                       <Avatar name={debtor.name} size="xl" />
-                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-white" />
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full flex items-center justify-center">
+                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                       </div>
                     </div>
-                    <div>
-                      <h4 className="text-xl font-bold text-gray-900 dark:text-white">{debtor.name}</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{debtor.email}</p>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white truncate">{debtor.name}</h4>
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">{debtor.email}</p>
                     </div>
                   </div>
 
                   {/* Deuda actual */}
-                  <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-2xl p-5 border-2 border-red-200 dark:border-red-800">
-                    <div className="flex items-center gap-2 mb-3">
-                      <DollarSign className="w-6 h-6 text-red-600 dark:text-red-400" />
-                      <p className="text-sm font-bold text-red-700 dark:text-red-300 uppercase tracking-wider">
+                  <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-5 border-2 border-red-200 dark:border-red-800">
+                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                      <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400 flex-shrink-0" />
+                      <p className="text-xs sm:text-sm font-bold text-red-700 dark:text-red-300 uppercase tracking-wider">
                         Saldo Pendiente Actual
                       </p>
                     </div>
-                    <p className="text-5xl font-bold text-red-600 dark:text-red-400 mb-2">
+                    <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-red-600 dark:text-red-400 mb-2 break-words">
                       {formatCurrency(debtor.totalDebt)}
                     </p>
-                    <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
-                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-red-600 dark:text-red-400">
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse flex-shrink-0"></div>
                       <span>Deuda activa</span>
                     </div>
                   </div>
 
                   {/* Account type */}
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 sm:p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <CreditCard className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Cuenta</p>
+                      <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
+                      <p className="text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase">Cuenta</p>
                     </div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">
                       {debtor.accountType}
                     </p>
                   </div>
 
                   {/* Wallet address - MEJORADO con word-break */}
-                  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                      <p className="text-sm font-bold text-indigo-700 dark:text-indigo-300 uppercase">Wallet Address</p>
+                  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-xl p-3 sm:p-4 border border-indigo-200 dark:border-indigo-800">
+                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                      <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
+                      <p className="text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300 uppercase">Wallet Address</p>
                     </div>
-                    <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3 mb-3">
-                      <code className="text-sm font-mono text-indigo-900 dark:text-indigo-100 break-all block leading-relaxed">
+                    <div className="bg-white/50 dark:bg-black/20 rounded-lg p-2 sm:p-3 mb-2 sm:mb-3">
+                      <code className="text-xs sm:text-sm font-mono text-indigo-900 dark:text-indigo-100 break-all block leading-relaxed">
                         {debtor.walletAddress}
                       </code>
                     </div>
                     <button
                       onClick={() => copyToClipboard(debtor.walletAddress)}
-                      className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-lg py-2 px-4 transition-all hover:scale-105 shadow-md"
+                      className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-lg py-2 px-3 sm:px-4 transition-all hover:scale-105 shadow-md"
                     >
-                      <Copy size={16} />
-                      <span className="font-semibold text-sm">Copiar Dirección</span>
+                      <Copy size={14} className="sm:w-4 sm:h-4" />
+                      <span className="font-semibold text-xs sm:text-sm">Copiar Dirección</span>
                     </button>
                   </div>
                 </CardContent>
@@ -532,29 +532,29 @@ export function PublicPayment() {
             <div className="lg:col-span-3">
               <Card className="shadow-2xl border-2 border-blue-200 dark:border-blue-800">
                 <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-b border-blue-200 dark:border-blue-800">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <Wallet className="w-6 h-6 text-blue-600" />
-                        Realizar Pago
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <Wallet className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0" />
+                        <span>Realizar Pago</span>
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
                         Paga tu deuda a través de Stellar Blockchain
                       </p>
                     </div>
-                    <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center">
-                      <CreditCard className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 dark:bg-blue-900/30 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0">
+                      <CreditCard className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600 dark:text-blue-400" />
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="p-8">
-                  <form onSubmit={handlePayment} className="space-y-6">
+                <CardContent className="p-4 sm:p-6 md:p-8">
+                  <form onSubmit={handlePayment} className="space-y-4 sm:space-y-6">
                     {/* Monto a pagar */}
                     <div>
-                      <Label required className="text-base">Monto a pagar (MXN)</Label>
+                      <Label required className="text-sm sm:text-base">Monto a pagar (MXN)</Label>
                       <div className="relative mt-2">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                          <DollarSign className={`w-6 h-6 transition-colors ${
+                        <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2">
+                          <DollarSign className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${
                             focusedField === 'amount' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'
                           }`} />
                         </div>
@@ -569,7 +569,7 @@ export function PublicPayment() {
                           onFocus={() => setFocusedField('amount')}
                           onBlur={() => setFocusedField(null)}
                           disabled={processing}
-                          className={`pl-14 pr-4 py-4 text-lg font-semibold border-2 transition-all ${
+                          className={`pl-12 sm:pl-14 pr-3 sm:pr-4 py-3 sm:py-4 text-base sm:text-lg font-semibold border-2 transition-all ${
                             amountError
                               ? 'border-red-500 focus:border-red-600'
                               : focusedField === 'amount'
@@ -579,12 +579,12 @@ export function PublicPayment() {
                         />
                       </div>
                       {amountError ? (
-                        <p className="text-sm text-red-600 dark:text-red-400 mt-2 flex items-center gap-1">
-                          <AlertCircle className="w-4 h-4" />
-                          {amountError}
+                        <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 mt-2 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                          <span>{amountError}</span>
                         </p>
                       ) : (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-2">
                           Máximo: <span className="font-semibold">{formatCurrency(debtor.totalDebt)}</span>
                         </p>
                       )}
@@ -592,31 +592,31 @@ export function PublicPayment() {
 
                     {/* Preview del pago */}
                     {paymentAmount && !amountError && parseFloat(paymentAmount) > 0 && (
-                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-6 border-2 border-green-200 dark:border-green-700 animate-fadeIn">
-                        <div className="flex items-center gap-2 mb-4">
-                          <TrendingDown className="w-5 h-5 text-green-600 dark:text-green-400" />
-                          <h4 className="text-sm font-bold text-green-700 dark:text-green-300 uppercase">Vista Previa del Pago</h4>
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-green-200 dark:border-green-700 animate-fadeIn">
+                        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                          <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                          <h4 className="text-xs sm:text-sm font-bold text-green-700 dark:text-green-300 uppercase">Vista Previa del Pago</h4>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-3 sm:gap-4">
                           <div>
-                            <p className="text-xs text-green-600 dark:text-green-400 mb-1">Pagarás</p>
-                            <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                            <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mb-1">Pagarás</p>
+                            <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-700 dark:text-green-300 break-words">
                               {formatCurrency(parseFloat(paymentAmount))}
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs text-green-600 dark:text-green-400 mb-1">Deuda restante</p>
-                            <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                            <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mb-1">Deuda restante</p>
+                            <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-700 dark:text-green-300 break-words">
                               {formatCurrency(remainingDebt)}
                             </p>
                           </div>
                         </div>
-                        <div className="mt-4 pt-4 border-t border-green-200 dark:border-green-700">
-                          <div className="flex items-center justify-between text-sm mb-2">
+                        <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-green-200 dark:border-green-700">
+                          <div className="flex items-center justify-between text-xs sm:text-sm mb-2">
                             <span className="text-green-700 dark:text-green-300 font-medium">Reducción de deuda</span>
                             <span className="text-green-700 dark:text-green-300 font-bold">{percentagePaid}%</span>
                           </div>
-                          <div className="w-full bg-green-200 dark:bg-green-900/50 rounded-full h-3 overflow-hidden">
+                          <div className="w-full bg-green-200 dark:bg-green-900/50 rounded-full h-2 sm:h-3 overflow-hidden">
                             <div
                               className="bg-gradient-to-r from-green-500 to-emerald-600 h-full transition-all duration-500 rounded-full"
                               style={{ width: `${Math.min(100, percentagePaid)}%` }}
@@ -628,7 +628,7 @@ export function PublicPayment() {
 
                     {/* Referencia */}
                     <div>
-                      <Label required className="text-base">Referencia / Concepto</Label>
+                      <Label required className="text-sm sm:text-base">Referencia / Concepto</Label>
                       <div className="relative mt-2">
                         <Input
                           type="text"
@@ -638,7 +638,7 @@ export function PublicPayment() {
                           onFocus={() => setFocusedField('reference')}
                           onBlur={() => setFocusedField(null)}
                           disabled={processing}
-                          className={`pr-4 py-4 text-base border-2 transition-all ${
+                          className={`pr-3 sm:pr-4 py-3 sm:py-4 text-sm sm:text-base border-2 transition-all ${
                             referenceError
                               ? 'border-red-500 focus:border-red-600'
                               : focusedField === 'reference'
@@ -648,63 +648,63 @@ export function PublicPayment() {
                         />
                       </div>
                       {referenceError && (
-                        <p className="text-sm text-red-600 dark:text-red-400 mt-2 flex items-center gap-1">
-                          <AlertCircle className="w-4 h-4" />
-                          {referenceError}
+                        <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 mt-2 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                          <span>{referenceError}</span>
                         </p>
                       )}
                     </div>
 
                     {/* Wallet de destino */}
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-700">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Wallet className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-purple-200 dark:border-purple-700">
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Wallet className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
                         </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-bold text-purple-700 dark:text-purple-300 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs sm:text-sm font-bold text-purple-700 dark:text-purple-300 mb-2">
                             Wallet de Destino
                           </p>
-                          <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3 mb-2">
-                            <code className="text-sm font-mono text-purple-900 dark:text-purple-100 break-all block">
+                          <div className="bg-white/50 dark:bg-black/20 rounded-lg p-2 sm:p-3 mb-2">
+                            <code className="text-xs sm:text-sm font-mono text-purple-900 dark:text-purple-100 break-all block">
                               {businessData.walletAddress}
                             </code>
                           </div>
                           <button
                             type="button"
                             onClick={() => copyToClipboard(businessData.walletAddress)}
-                            className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-semibold flex items-center gap-1 transition-colors"
+                            className="text-xs sm:text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-semibold flex items-center gap-1 transition-colors"
                           >
-                            <Copy size={14} />
-                            Copiar dirección
+                            <Copy size={14} className="flex-shrink-0" />
+                            <span>Copiar dirección</span>
                           </button>
                         </div>
                       </div>
                     </div>
 
                     {/* Info importante */}
-                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-200 dark:border-yellow-800 rounded-2xl p-6">
-                      <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Info className="w-6 h-6 text-yellow-700 dark:text-yellow-400" />
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-200 dark:border-yellow-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-100 dark:bg-yellow-900/50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Info className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-700 dark:text-yellow-400" />
                         </div>
-                        <div>
-                          <p className="font-bold text-yellow-900 dark:text-yellow-100 mb-2">Importante:</p>
-                          <ul className="space-y-2 text-sm text-yellow-800 dark:text-yellow-200">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm sm:text-base font-bold text-yellow-900 dark:text-yellow-100 mb-2">Importante:</p>
+                          <ul className="space-y-2 text-xs sm:text-sm text-yellow-800 dark:text-yellow-200">
                             <li className="flex items-start gap-2">
-                              <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                              <span className="text-yellow-600 dark:text-yellow-400 mt-0.5 sm:mt-1 flex-shrink-0">•</span>
                               <span>El pago será registrado en la blockchain Stellar</span>
                             </li>
                             <li className="flex items-start gap-2">
-                              <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                              <span className="text-yellow-600 dark:text-yellow-400 mt-0.5 sm:mt-1 flex-shrink-0">•</span>
                               <span>Tu pago entrará en estado de <strong>revisión</strong></span>
                             </li>
                             <li className="flex items-start gap-2">
-                              <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                              <span className="text-yellow-600 dark:text-yellow-400 mt-0.5 sm:mt-1 flex-shrink-0">•</span>
                               <span>El administrador lo verificará en 24-48 horas</span>
                             </li>
                             <li className="flex items-start gap-2">
-                              <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                              <span className="text-yellow-600 dark:text-yellow-400 mt-0.5 sm:mt-1 flex-shrink-0">•</span>
                               <span>Recibirás confirmación una vez aprobado</span>
                             </li>
                           </ul>
@@ -722,20 +722,20 @@ export function PublicPayment() {
                     >
                       {processing ? (
                         <>
-                          <Loader2 className="w-6 h-6 animate-spin" />
-                          <span className="text-lg">Procesando en Stellar...</span>
+                          <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
+                          <span className="text-base sm:text-lg">Procesando en Stellar...</span>
                         </>
                       ) : (
                         <>
-                          <ShieldCheck size={24} />
-                          <span className="text-lg font-bold">Pagar con Stellar</span>
+                          <ShieldCheck size={20} className="sm:w-6 sm:h-6" />
+                          <span className="text-base sm:text-lg font-bold">Pagar con Stellar</span>
                         </>
                       )}
                     </Button>
 
-                    <p className="text-xs text-center text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2">
-                      <Lock size={14} />
-                      Transacción segura verificada por Stellar Blockchain
+                    <p className="text-xs sm:text-sm text-center text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2">
+                      <Lock size={14} className="sm:w-4 sm:h-4 flex-shrink-0" />
+                      <span>Transacción segura verificada por Stellar Blockchain</span>
                     </p>
                   </form>
                 </CardContent>
