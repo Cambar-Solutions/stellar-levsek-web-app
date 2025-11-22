@@ -13,8 +13,10 @@ class ChatbotService {
 
   /**
    * Enviar mensaje al chatbot
+   * @param {string} userMessage - El mensaje del usuario
+   * @param {object|null} user - Objeto de usuario (null si no hay sesión activa)
    */
-  async sendMessage(userMessage) {
+  async sendMessage(userMessage, user = null) {
     // Agregar mensaje del usuario al historial
     this.conversationHistory.push({
       role: 'user',
@@ -26,10 +28,10 @@ class ChatbotService {
 
       if (this.useAI) {
         // Opción A: Usar Anthropic AI (requiere endpoint en backend)
-        response = await this.getAIResponse(userMessage)
+        response = await this.getAIResponse(userMessage, user)
       } else {
         // Opción B: Respuestas inteligentes basadas en palabras clave
-        response = this.getSmartResponse(userMessage)
+        response = this.getSmartResponse(userMessage, user)
       }
 
       // Agregar respuesta al historial
@@ -48,7 +50,7 @@ class ChatbotService {
   /**
    * Obtener respuesta de AI (requiere backend)
    */
-  async getAIResponse(userMessage) {
+  async getAIResponse(userMessage, user = null) {
     try {
       const response = await fetch('http://localhost:4008/chatbot/ask', {
         method: 'POST',
@@ -58,6 +60,7 @@ class ChatbotService {
         body: JSON.stringify({
           message: userMessage,
           history: this.conversationHistory.slice(-10), // Últimos 10 mensajes
+          isAuthenticated: !!user, // Enviar si el usuario está autenticado
         }),
       })
 
@@ -70,15 +73,61 @@ class ChatbotService {
     } catch (error) {
       console.warn('Backend no disponible, usando respuestas locales:', error.message)
       // Fallback a respuestas locales si el backend no está disponible
-      return this.getSmartResponse(userMessage)
+      return this.getSmartResponse(userMessage, user)
     }
   }
 
   /**
    * Respuestas inteligentes basadas en contexto y palabras clave
+   * @param {string} userMessage - El mensaje del usuario
+   * @param {object|null} user - Objeto de usuario (null si no hay sesión activa)
    */
-  getSmartResponse(userMessage) {
+  getSmartResponse(userMessage, user = null) {
     const message = userMessage.toLowerCase()
+    const isAuthenticated = !!user
+
+    // Palabras clave de funciones administrativas
+    const adminKeywords = [
+      'aprobar',
+      'rechazar',
+      'registrar deuda',
+      'agregar deudor',
+      'eliminar deudor',
+      'dashboard',
+      'admin',
+      'administrador',
+      'gestionar',
+      'crear deuda',
+      'borrar',
+    ]
+
+    // Verificar si un usuario NO autenticado está preguntando sobre funciones de admin
+    if (!isAuthenticated) {
+      const isAskingAboutAdmin = adminKeywords.some((keyword) =>
+        message.includes(keyword)
+      )
+
+      if (isAskingAboutAdmin) {
+        return `🔒 **Función de Administrador**
+
+Lo que preguntas requiere una cuenta de administrador.
+
+**¿Eres administrador?**
+👉 [Inicia sesión aquí](/login) para acceder a todas las funciones administrativas como:
+- Aprobar/rechazar pagos
+- Registrar deudas
+- Gestionar deudores
+- Ver dashboard completo
+
+**¿Eres cliente?**
+Como cliente puedes:
+💳 Ver tu deuda en la vista pública
+💰 Realizar pagos con Stellar
+📊 Consultar el estado de tus pagos
+
+¿Necesitas ayuda con algo más?`
+      }
+    }
 
     // Base de conocimiento con patrones y respuestas
     const responses = [
@@ -318,26 +367,165 @@ Por favor, proporciona más detalles sobre el error:
       // AYUDA GENERAL
       {
         keywords: ['ayuda', 'help', 'como uso', 'tutorial', 'guía', 'empezar'],
-        response: `📚 **Ayuda General:**
+        response: isAuthenticated
+          ? `📚 **Ayuda para Administradores:**
 
-**¿Eres cliente?**
+¡Hola ${user?.name || 'Admin'}! Puedo ayudarte con:
+
+🎯 **Gestión de Deudas:**
+- Registrar nuevas deudas
+- Ver historial completo de deudores
+- Consultar estadísticas en tiempo real
+
+💳 **Gestión de Pagos:**
+- Aprobar pagos pendientes
+- Rechazar pagos sospechosos
+- Ver historial de transacciones
+
+👥 **Gestión de Deudores:**
+- Agregar nuevos clientes
+- Actualizar información
+- Eliminar deudores sin deudas
+
+📊 **Dashboard:**
+- Ver resumen general
+- Estadísticas de deudas
+- Pagos verificados vs pendientes
+
+¿Qué necesitas hacer hoy?`
+          : `📚 **Ayuda para Clientes:**
+
+¡Bienvenido! Como cliente puedes:
+
+💳 **Ver tu Deuda:**
 1. Accede a la vista pública
-2. Busca tu nombre
-3. Paga tu deuda con Stellar
+2. Busca tu nombre en la lista
+3. Verás tu saldo pendiente actual
 
-**¿Eres administrador?**
-1. Inicia sesión
-2. Gestiona deudores desde "Deudores"
-3. Aprueba pagos desde "Pagos Pendientes"
-4. Ve estadísticas en "Dashboard"
+💰 **Realizar un Pago:**
+1. Encuentra tu nombre
+2. Click en "Pagar"
+3. Ingresa el monto
+4. Paga con Stellar blockchain
 
-💡 **Funciones principales:**
-- 📊 Registrar deudas
-- 💳 Aprobar/rechazar pagos
-- 👥 Gestionar deudores
-- 📈 Ver estadísticas
+📊 **Estado de Pagos:**
+- Los pagos van a "Revisión"
+- El admin los aprueba
+- Se descuenta de tu deuda
 
-¿En qué puedo ayudarte específicamente?`,
+🔒 **¿Eres Administrador?**
+👉 [Inicia sesión aquí](/login)
+
+¿En qué puedo ayudarte?`,
+      },
+
+      // CLIENTES - CONSULTA DE DEUDA
+      {
+        keywords: ['cuánto debo', 'mi deuda', 'saldo', 'debe', 'debo'],
+        response: isAuthenticated
+          ? `💰 **Consultar Deuda (Admin):**
+
+Como administrador puedes ver las deudas de cualquier cliente:
+
+1. Ve a la sección "Deudores"
+2. Busca al cliente en la lista
+3. Click en su nombre para ver detalles:
+   - Saldo total pendiente
+   - Historial de deudas individuales
+   - Historial de pagos
+   - Pagos pendientes de aprobación
+
+💡 También puedes ver el resumen en el Dashboard.`
+          : `💰 **Consultar tu Deuda:**
+
+Para ver cuánto debes:
+
+1. Accede a la **vista pública** del negocio
+2. Busca tu nombre en la lista de deudores
+3. Verás:
+   - Tu saldo total pendiente
+   - Tu wallet de Stellar
+   - Estado de tus pagos
+
+💡 **Tip:** Guarda el link de la vista pública para consultar tu deuda cuando quieras.
+
+🔍 **¿No encuentras tu nombre?**
+Es posible que no tengas deudas pendientes o aún no estés registrado. Contacta al administrador.`,
+      },
+
+      // CLIENTES - WALLET Y BLOCKCHAIN
+      {
+        keywords: ['wallet', 'dirección', 'stellar', 'blockchain', 'qué es stellar'],
+        response: `⛓️ **Stellar Blockchain:**
+
+Stellar es una red blockchain que usamos para registrar todas las deudas y pagos de forma **segura e inmutable**.
+
+🔑 **Tu Wallet:**
+- Es tu dirección única en Stellar
+- Empieza con "G" y tiene ~56 caracteres
+- Se genera automáticamente cuando te registran
+
+✅ **Beneficios:**
+- ✨ **Transparencia total:** Todos pueden verificar
+- 🔒 **Inmutabilidad:** Nadie puede modificar el historial
+- ⚡ **Rapidez:** Transacciones en segundos
+- 💰 **Bajo costo:** Comisiones mínimas
+
+💡 Cada pago que realizas genera un "hash" único que sirve como comprobante inmutable.`,
+      },
+
+      // CLIENTES - MÉTODO DE PAGO
+      {
+        keywords: ['cómo pago', 'método de pago', 'formas de pago', 'puedo pagar con'],
+        response: `💳 **Métodos de Pago:**
+
+El sistema acepta varios métodos:
+
+1. **Stellar (Recomendado)** ⭐
+   - Pago directo con blockchain
+   - Confirmación inmediata
+   - Registro automático
+
+2. **Efectivo**
+   - Entrega al administrador
+   - Debe aprobar el pago manualmente
+
+3. **Transferencia Bancaria**
+   - Envía y guarda comprobante
+   - Agrega referencia al pagar
+
+4. **Tarjeta (Stripe)**
+   - Pago en línea
+   - Procesamiento seguro
+
+💡 **Importante:** Todos los pagos pasan por revisión del administrador antes de descontarse de tu deuda.`,
+      },
+
+      // SEGURIDAD Y PRIVACIDAD
+      {
+        keywords: ['seguro', 'seguridad', 'privacidad', 'datos', 'información segura'],
+        response: `🔒 **Seguridad y Privacidad:**
+
+Tu información está protegida en múltiples capas:
+
+**🔐 Seguridad de Datos:**
+- ✅ Encriptación de contraseñas (bcrypt)
+- ✅ Autenticación con JWT tokens
+- ✅ HTTPS para todas las comunicaciones
+- ✅ Base de datos segura (MySQL)
+
+**⛓️ Blockchain:**
+- ✅ Registro inmutable en Stellar
+- ✅ Transparencia verificable
+- ✅ Sin posibilidad de alteración
+- ✅ Hash único por transacción
+
+**👁️ Privacidad:**
+- Solo el admin y el cliente ven detalles completos
+- La vista pública muestra info mínima necesaria
+- No compartimos datos con terceros
+
+💡 Tu información financiera está tan segura como en un banco, ¡pero con transparencia blockchain!`,
       },
     ]
 
@@ -349,33 +537,72 @@ Por favor, proporciona más detalles sobre el error:
     }
 
     // Respuesta por defecto si no hay coincidencia
-    return `🤖 **Asistente Levsek**
+    if (isAuthenticated) {
+      return `🤖 **Asistente Levsek** - Modo Administrador
 
-Puedo ayudarte con:
+¡Hola ${user?.name || 'Admin'}! Puedo ayudarte con:
 
-💳 **Pagos**
-- Cómo realizar pagos
-- Aprobar/rechazar pagos
-- Estado de pagos pendientes
+💳 **Gestión de Pagos**
+- Aprobar/rechazar pagos pendientes
+- Ver historial de transacciones
+- Consultar estado de pagos
 
-📊 **Deudas**
+📊 **Gestión de Deudas**
 - Registrar nuevas deudas
-- Ver saldo actual
-- Eliminar deudores
+- Actualizar deudas existentes
+- Ver saldo de clientes
+
+👥 **Gestión de Deudores**
+- Agregar nuevos clientes
+- Actualizar información
+- Eliminar deudores sin deudas
 
 🌐 **Vista Pública**
-- Acceso para clientes
-- URL pública
+- Compartir URL con clientes
+- Configuración de acceso
+
+⛓️ **Blockchain Stellar**
+- Cómo funciona
+- Verificar transacciones
+- Ver hashes
+
+🔧 **Soporte Técnico**
+- Solución de problemas
+- Errores comunes
+
+¿En qué puedo ayudarte específicamente?`
+    } else {
+      return `🤖 **Asistente Levsek** - Modo Cliente
+
+¡Bienvenido! Puedo ayudarte con:
+
+💳 **Realizar Pagos**
+- Cómo pagar mi deuda
+- Métodos de pago disponibles
+- Estado de mis pagos
+
+💰 **Consultar Deuda**
+- Ver cuánto debo
+- Acceder a la vista pública
+- Historial de pagos
 
 ⛓️ **Blockchain**
-- Qué es el hash
-- Cómo funciona Stellar
+- Qué es Stellar
+- Para qué sirve mi wallet
+- Verificar transacciones
 
-🔧 **Problemas técnicos**
-- Errores comunes
-- Troubleshooting
+🔒 **Seguridad**
+- Cómo protegemos tus datos
+- Privacidad de información
+
+📞 **Contacto**
+- Comunicarme con el administrador
+
+🔑 **¿Eres Administrador?**
+👉 [Inicia sesión aquí](/login) para acceder a funciones avanzadas
 
 ¿Sobre qué tema necesitas ayuda?`
+    }
   }
 
   /**
