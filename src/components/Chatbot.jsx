@@ -1,21 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
-import { MessageCircle, X, Send, Loader2, Shield, User } from 'lucide-react'
+import { MessageCircle, X, Send, Loader2 } from 'lucide-react'
 import { marked } from 'marked'
 import chatbotService from '../services/chatbotService'
-import { useAuth } from '../contexts/AuthContext'
 import '../styles/chatbot.css'
 
 export function Chatbot() {
-  const { user } = useAuth() // Get authenticated user
-  const isAuthenticated = !!user
-
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: isAuthenticated
-        ? `👋 ¡Hola ${user?.name || 'Admin'}! Soy el asistente de Levsek. ¿En qué puedo ayudarte hoy?`
-        : '👋 ¡Hola! Soy el asistente de Levsek. ¿En qué puedo ayudarte hoy?',
+      content: '👋 ¡Hola! Soy el asistente de Levsek. ¿En qué puedo ayudarte hoy?',
       timestamp: new Date(),
     },
   ])
@@ -59,8 +53,8 @@ export function Chatbot() {
     setIsLoading(true)
 
     try {
-      // Get bot response (pass user for session-based responses)
-      const response = await chatbotService.sendMessage(userMessage, user)
+      // Get bot response
+      const response = await chatbotService.sendMessage(userMessage)
 
       // Add bot response
       const botMessage = {
@@ -124,18 +118,6 @@ export function Chatbot() {
                 <p className="chatbot-subtitle">
                   <span className="chatbot-status-dot"></span>
                   En línea
-                  {isAuthenticated && (
-                    <span className="chatbot-auth-badge">
-                      <Shield size={12} />
-                      Admin
-                    </span>
-                  )}
-                  {!isAuthenticated && (
-                    <span className="chatbot-public-badge">
-                      <User size={12} />
-                      Cliente
-                    </span>
-                  )}
                 </p>
               </div>
             </div>
@@ -218,49 +200,30 @@ export function Chatbot() {
 
           {/* Quick Actions */}
           <div className="chatbot-quick-actions">
-            {isAuthenticated ? (
-              <>
-                <button
-                  onClick={() => setInput('¿Cómo aprobar pagos pendientes?')}
-                  className="chatbot-quick-btn"
-                >
-                  ✅ Aprobar pagos
-                </button>
-                <button
-                  onClick={() => setInput('¿Cómo registrar una deuda?')}
-                  className="chatbot-quick-btn"
-                >
-                  📊 Registrar deuda
-                </button>
-                <button
-                  onClick={() => setInput('Ver estadísticas del dashboard')}
-                  className="chatbot-quick-btn"
-                >
-                  📈 Dashboard
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => setInput('¿Cómo realizar un pago?')}
-                  className="chatbot-quick-btn"
-                >
-                  💳 Cómo pagar
-                </button>
-                <button
-                  onClick={() => setInput('¿Cuánto debo?')}
-                  className="chatbot-quick-btn"
-                >
-                  💰 Mi deuda
-                </button>
-                <button
-                  onClick={() => setInput('¿Qué es Stellar blockchain?')}
-                  className="chatbot-quick-btn"
-                >
-                  ⛓️ Blockchain
-                </button>
-              </>
-            )}
+            <button
+              onClick={() =>
+                setInput('¿Cómo realizar un pago?')
+              }
+              className="chatbot-quick-btn"
+            >
+              💳 Cómo pagar
+            </button>
+            <button
+              onClick={() =>
+                setInput('¿Cómo aprobar pagos pendientes?')
+              }
+              className="chatbot-quick-btn"
+            >
+              ✅ Aprobar pagos
+            </button>
+            <button
+              onClick={() =>
+                setInput('¿Cómo registrar una deuda?')
+              }
+              className="chatbot-quick-btn"
+            >
+              📊 Registrar deuda
+            </button>
           </div>
         </div>
       )}
