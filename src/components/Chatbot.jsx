@@ -114,7 +114,7 @@ export function Chatbot() {
                 <MessageCircle size={20} />
               </div>
               <div>
-                <h3 className="chatbot-title">Asistente Levsek</h3>
+                <h3 className="chatbot-title">ISIS BOT IA</h3>
                 <p className="chatbot-subtitle">
                   <span className="chatbot-status-dot"></span>
                   En línea

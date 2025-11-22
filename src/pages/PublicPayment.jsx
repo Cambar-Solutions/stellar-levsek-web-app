@@ -14,9 +14,16 @@ import {
   CheckCircle2,
   Info,
   Loader2,
+  AlertCircle,
+  TrendingDown,
+  Sparkles,
+  CreditCard,
+  Lock,
+  Check,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { getPublicSiteInfo, getDebtsByCustomer, createPendingPayment } from '../services/debtService'
+import confetti from 'canvas-confetti'
 
 export function PublicPayment() {
   const { siteId, debtorId: debtorIdParam } = useParams()
@@ -28,6 +35,9 @@ export function PublicPayment() {
   const [processing, setProcessing] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [amountError, setAmountError] = useState('')
+  const [referenceError, setReferenceError] = useState('')
+  const [focusedField, setFocusedField] = useState(null)
 
   // Convert IDs from URL params to numbers for comparison
   const debtorId = Number(debtorIdParam)
@@ -65,7 +75,71 @@ export function PublicPayment() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
-    toast.success('Copiado al portapapeles')
+    toast.success('Copiado al portapapeles', {
+      icon: '📋',
+      style: {
+        borderRadius: '12px',
+        background: '#333',
+        color: '#fff',
+      },
+    })
+  }
+
+  const validateAmount = (value) => {
+    const amount = parseFloat(value)
+
+    if (!value || value.trim() === '') {
+      setAmountError('El monto es requerido')
+      return false
+    }
+
+    if (isNaN(amount) || amount <= 0) {
+      setAmountError('Ingresa un monto válido mayor a $0')
+      return false
+    }
+
+    if (amount > debtor.totalDebt) {
+      setAmountError(`El monto excede la deuda de ${formatCurrency(debtor.totalDebt)}`)
+      return false
+    }
+
+    setAmountError('')
+    return true
+  }
+
+  const validateReference = (value) => {
+    if (!value || value.trim() === '') {
+      setReferenceError('La referencia es requerida')
+      return false
+    }
+
+    if (value.trim().length < 3) {
+      setReferenceError('La referencia debe tener al menos 3 caracteres')
+      return false
+    }
+
+    setReferenceError('')
+    return true
+  }
+
+  const handleAmountChange = (e) => {
+    const value = e.target.value
+    setPaymentAmount(value)
+    if (value) {
+      validateAmount(value)
+    } else {
+      setAmountError('')
+    }
+  }
+
+  const handleReferenceChange = (e) => {
+    const value = e.target.value
+    setTxReference(value)
+    if (value) {
+      validateReference(value)
+    } else {
+      setReferenceError('')
+    }
   }
 
   const simulateStellarPayment = async (amount) => {
@@ -78,26 +152,46 @@ export function PublicPayment() {
     })
   }
 
+  const celebrateSuccess = () => {
+    const duration = 5000
+    const animationEnd = Date.now() + duration
+
+    const interval = setInterval(function() {
+      const timeLeft = animationEnd - Date.now()
+      if (timeLeft <= 0) {
+        return clearInterval(interval)
+      }
+
+      const particleCount = 50 * (timeLeft / duration)
+
+      confetti({
+        particleCount,
+        startVelocity: 30,
+        spread: 360,
+        origin: {
+          x: Math.random(),
+          y: Math.random() - 0.2
+        },
+        colors: ['#10b981', '#34d399', '#6ee7b7', '#3b82f6', '#60a5fa']
+      })
+    }, 250)
+  }
+
   const handlePayment = async (e) => {
     e.preventDefault()
 
+    // Validar ambos campos
+    const isAmountValid = validateAmount(paymentAmount)
+    const isReferenceValid = validateReference(txReference)
+
+    if (!isAmountValid || !isReferenceValid) {
+      toast.error('Por favor corrige los errores antes de continuar', {
+        icon: '⚠️',
+      })
+      return
+    }
+
     const amount = parseFloat(paymentAmount)
-
-    if (!amount || amount <= 0) {
-      toast.error('Ingresa un monto válido')
-      return
-    }
-
-    if (amount > debtor.totalDebt) {
-      toast.error('El monto excede la deuda pendiente')
-      return
-    }
-
-    if (!txReference.trim()) {
-      toast.error('Ingresa una referencia de transacción')
-      return
-    }
-
     setProcessing(true)
 
     try {
@@ -136,12 +230,20 @@ export function PublicPayment() {
         // Recargar datos para reflejar el nuevo estado
         await loadPublicData()
 
+        // Celebración
+        celebrateSuccess()
         setPaymentSuccess(true)
-        toast.success('¡Pago registrado exitosamente! Será revisado por el administrador.')
+
+        toast.success('¡Pago registrado exitosamente!', {
+          icon: '🎉',
+          duration: 4000,
+        })
       }
     } catch (error) {
       console.error('Error al procesar el pago:', error)
-      toast.error('Error al procesar el pago')
+      toast.error('Error al procesar el pago. Por favor intenta de nuevo.', {
+        icon: '❌',
+      })
     } finally {
       setProcessing(false)
     }
@@ -149,26 +251,36 @@ export function PublicPayment() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
-        <Card className="max-w-md">
-          <CardContent className="p-12 text-center">
-            <Loader2 className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4 animate-spin" />
-            <p className="text-gray-600 dark:text-gray-300">Cargando información...</p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="relative">
+            <div className="w-24 h-24 border-4 border-purple-200 dark:border-purple-800 border-t-purple-600 dark:border-t-purple-400 rounded-full animate-spin mx-auto mb-6"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader2 className="w-10 h-10 text-purple-600 dark:text-purple-400 animate-pulse" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 animate-pulse">
+            Cargando información de pago...
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Conectando con Stellar Blockchain
+          </p>
+        </div>
       </div>
     )
   }
 
   if (!businessData || !debtor) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
-        <Card className="max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
           <CardContent className="p-12 text-center">
-            <Info className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Deudor no encontrado</h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">No se pudo cargar la información del deudor.</p>
-            <Button onClick={() => navigate(`/public/${siteId}`)} variant="primary">
+            <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Deudor no encontrado</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">No se pudo cargar la información del deudor.</p>
+            <Button onClick={() => navigate(`/public/${siteId}`)} variant="primary" className="mx-auto">
               Volver al Registro Público
             </Button>
           </CardContent>
@@ -179,65 +291,102 @@ export function PublicPayment() {
 
   if (paymentSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
-        <Card className="max-w-2xl w-full">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
+        <Card className="max-w-3xl w-full shadow-2xl">
           <CardContent className="p-12 text-center">
-            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
-              <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
-              ¡Pago Registrado Exitosamente!
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
-              Tu pago de <span className="font-bold text-green-600 dark:text-green-400">{formatCurrency(parseFloat(paymentAmount))}</span> ha sido
-              registrado en la blockchain de Stellar
-            </p>
-
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 mb-6">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 mb-1">Monto pagado</p>
-                  <p className="font-bold text-gray-900 dark:text-white">{formatCurrency(parseFloat(paymentAmount))}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 mb-1">Deuda restante estimada</p>
-                  <p className="font-bold text-gray-900 dark:text-white">{formatCurrency(debtor.totalDebt - parseFloat(paymentAmount))}</p>
-                </div>
-              </div>
+            <div className="w-28 h-28 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl animate-bounce">
+              <CheckCircle2 className="w-16 h-16 text-white" />
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 mb-8 text-left">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm text-blue-900 dark:text-blue-200 font-semibold mb-2">
-                    ¿Qué sigue?
+            <div className="mb-8">
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                ¡Pago Registrado Exitosamente! 🎉
+              </h2>
+              <p className="text-xl text-gray-600 dark:text-gray-300">
+                Tu pago de <span className="font-bold text-green-600 dark:text-green-400">{formatCurrency(parseFloat(paymentAmount))}</span> ha sido
+                registrado en la blockchain de Stellar
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
+                    <p className="text-sm font-semibold text-green-700 dark:text-green-300">Monto Pagado</p>
+                  </div>
+                  <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                    {formatCurrency(parseFloat(paymentAmount))}
                   </p>
-                  <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-2">
-                    <li className="flex items-start gap-2">
-                      <span className="text-blue-600 dark:text-blue-400">1.</span>
-                      <span>Tu pago está ahora <strong>en revisión</strong> por el equipo de {businessData.name}</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-blue-600 dark:text-blue-400">2.</span>
-                      <span>El administrador verificará la transacción en la blockchain</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-blue-600 dark:text-blue-400">3.</span>
-                      <span>Una vez aprobado, tu deuda se actualizará automáticamente</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-blue-600 dark:text-blue-400">4.</span>
-                      <span>Tiempo estimado de revisión: <strong>24-48 horas</strong></span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-blue-200 dark:border-blue-700">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <TrendingDown className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">Deuda Restante (estimada)</p>
+                  </div>
+                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                    {formatCurrency(debtor.totalDebt - parseFloat(paymentAmount))}
+                  </p>
+                </CardContent>
+              </Card>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-700 mb-8">
+              <CardContent className="p-6 text-left">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Info className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-indigo-900 dark:text-indigo-100 mb-3">
+                      ¿Qué sigue ahora?
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-indigo-200 dark:bg-indigo-800 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-indigo-700 dark:text-indigo-300">1</span>
+                        </div>
+                        <p className="text-indigo-800 dark:text-indigo-200 pt-1">
+                          Tu pago está ahora <strong className="text-indigo-900 dark:text-indigo-100">en revisión</strong> por el equipo de {businessData.name}
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-indigo-200 dark:bg-indigo-800 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-indigo-700 dark:text-indigo-300">2</span>
+                        </div>
+                        <p className="text-indigo-800 dark:text-indigo-200 pt-1">
+                          El administrador verificará la transacción en la blockchain de Stellar
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-indigo-200 dark:bg-indigo-800 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-indigo-700 dark:text-indigo-300">3</span>
+                        </div>
+                        <p className="text-indigo-800 dark:text-indigo-200 pt-1">
+                          Una vez aprobado, tu deuda se actualizará automáticamente en el sistema
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-green-500 dark:bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Check className="w-5 h-5 text-white" />
+                        </div>
+                        <p className="text-indigo-800 dark:text-indigo-200 pt-1">
+                          Tiempo estimado de revisión: <strong className="text-indigo-900 dark:text-indigo-100">24-48 horas</strong>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 variant="ghost"
+                size="lg"
                 onClick={() => navigate(`/public/${siteId}`)}
                 className="flex-1"
               >
@@ -245,8 +394,9 @@ export function PublicPayment() {
               </Button>
               <Button
                 variant="primary"
+                size="lg"
                 onClick={() => window.location.reload()}
-                className="flex-1"
+                className="flex-1 shadow-lg"
               >
                 Realizar Otro Pago
               </Button>
@@ -257,189 +407,341 @@ export function PublicPayment() {
     )
   }
 
+  const remainingDebt = debtor.totalDebt - (parseFloat(paymentAmount) || 0)
+  const percentagePaid = paymentAmount ? ((parseFloat(paymentAmount) / debtor.totalDebt) * 100).toFixed(1) : 0
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <ShieldCheck className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {businessData.name}
-                </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Portal de Pagos Públicos</p>
-              </div>
-            </div>
-            <button
-              onClick={() => navigate(`/public/${siteId}`)}
-              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            >
-              <ArrowLeft size={20} />
-              <span className="hidden sm:inline">Volver</span>
-            </button>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
+      {/* Animated background blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-300 dark:bg-pink-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Debtor Info */}
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                Información del Deudor
-              </h3>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
-              <div className="flex items-center gap-3 mb-4">
-                <Avatar name={debtor.name} size="lg" />
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Header */}
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => navigate(`/public/${siteId}`)}
+                  className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors hover:scale-105"
+                >
+                  <ArrowLeft size={20} />
+                  <span className="font-medium">Volver</span>
+                </button>
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-xl">
+                  <ShieldCheck className="w-7 h-7 text-white" />
+                </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 dark:text-white">{debtor.name}</h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">{debtor.email}</p>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {businessData.name}
+                  </h1>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Portal de Pagos Públicos</p>
                 </div>
               </div>
+              <Badge variant="success" className="flex items-center gap-2 shadow-lg">
+                <ShieldCheck className="w-4 h-4" />
+                Pago Seguro
+              </Badge>
+            </div>
+          </div>
+        </div>
 
-              <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-4">
-                <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Saldo Pendiente</p>
-                <p className="text-3xl font-bold text-red-600 dark:text-red-400">
-                  {formatCurrency(debtor.totalDebt)}
-                </p>
-              </div>
-
-              <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Cuenta</p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {debtor.accountType}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Wallet Address</p>
-                  <div className="flex items-center gap-2">
-                    <code className="text-xs font-mono text-gray-700 dark:text-gray-200 flex-1">
-                      {debtor.walletAddress}
-                    </code>
-                    <button
-                      onClick={() => copyToClipboard(debtor.walletAddress)}
-                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                    >
-                      <Copy size={16} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Payment Form */}
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                Realizar Pago
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                Paga tu deuda a través de Stellar Blockchain
-              </p>
-            </CardHeader>
-            <CardContent className="p-6">
-              <form onSubmit={handlePayment} className="space-y-5">
-                <div>
-                  <Label required>Monto a pagar (MXN)</Label>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    icon={DollarSign}
-                    step="0.01"
-                    min="0.01"
-                    max={debtor.totalDebt}
-                    value={paymentAmount}
-                    onChange={(e) => setPaymentAmount(e.target.value)}
-                    disabled={processing}
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1">
-                    Máximo: {formatCurrency(debtor.totalDebt)}
-                  </p>
-                </div>
-
-                <div>
-                  <Label required>Referencia / Concepto</Label>
-                  <Input
-                    type="text"
-                    placeholder="Ej: Pago parcial abono 1"
-                    value={txReference}
-                    onChange={(e) => setTxReference(e.target.value)}
-                    disabled={processing}
-                  />
-                </div>
-
-                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
-                  <div className="flex items-start gap-3">
-                    <Wallet className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-1">
-                        Wallet de Destino
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <code className="text-xs font-mono text-blue-700 dark:text-blue-300">
-                          {businessData.walletAddress}
-                        </code>
-                        <button
-                          type="button"
-                          onClick={() => copyToClipboard(businessData.walletAddress)}
-                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
-                        >
-                          <Copy size={14} />
-                        </button>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            {/* Debtor Info - 2/5 del espacio */}
+            <div className="lg:col-span-2 space-y-6">
+              <Card className="shadow-xl border-2 border-purple-200 dark:border-purple-800">
+                <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-b border-purple-200 dark:border-purple-800">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-purple-600" />
+                    Información del Deudor
+                  </h3>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6">
+                  {/* Avatar y nombre */}
+                  <div className="flex items-center gap-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                    <div className="relative">
+                      <Avatar name={debtor.name} size="xl" />
+                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full flex items-center justify-center">
+                        <CheckCircle2 className="w-4 h-4 text-white" />
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800/50 rounded-xl p-4">
-                  <div className="flex items-start gap-3">
-                    <Info className="w-5 h-5 text-yellow-700 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-yellow-800 dark:text-yellow-300">
-                      <p className="font-semibold mb-1">Importante:</p>
-                      <ul className="space-y-1 text-xs">
-                        <li>• El pago será registrado en la blockchain Stellar</li>
-                        <li>• Tu pago entrará en estado de revisión</li>
-                        <li>• El administrador lo verificará en 24-48 horas</li>
-                        <li>• Recibirás confirmación una vez aprobado</li>
-                      </ul>
+                    <div>
+                      <h4 className="text-xl font-bold text-gray-900 dark:text-white">{debtor.name}</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{debtor.email}</p>
                     </div>
                   </div>
-                </div>
 
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="lg"
-                  className="w-full"
-                  disabled={processing}
-                >
-                  {processing ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Procesando en Stellar...
-                    </>
-                  ) : (
-                    <>
-                      <ShieldCheck size={20} />
-                      Pagar con Stellar
-                    </>
-                  )}
-                </Button>
+                  {/* Deuda actual */}
+                  <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-2xl p-5 border-2 border-red-200 dark:border-red-800">
+                    <div className="flex items-center gap-2 mb-3">
+                      <DollarSign className="w-6 h-6 text-red-600 dark:text-red-400" />
+                      <p className="text-sm font-bold text-red-700 dark:text-red-300 uppercase tracking-wider">
+                        Saldo Pendiente Actual
+                      </p>
+                    </div>
+                    <p className="text-5xl font-bold text-red-600 dark:text-red-400 mb-2">
+                      {formatCurrency(debtor.totalDebt)}
+                    </p>
+                    <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                      <span>Deuda activa</span>
+                    </div>
+                  </div>
 
-                <p className="text-xs text-center text-gray-500 dark:text-gray-400 dark:text-gray-500">
-                  Transacción segura verificada por Stellar Blockchain
-                </p>
-              </form>
-            </CardContent>
-          </Card>
+                  {/* Account type */}
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CreditCard className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Cuenta</p>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {debtor.accountType}
+                    </p>
+                  </div>
+
+                  {/* Wallet address - MEJORADO con word-break */}
+                  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                      <p className="text-sm font-bold text-indigo-700 dark:text-indigo-300 uppercase">Wallet Address</p>
+                    </div>
+                    <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3 mb-3">
+                      <code className="text-sm font-mono text-indigo-900 dark:text-indigo-100 break-all block leading-relaxed">
+                        {debtor.walletAddress}
+                      </code>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(debtor.walletAddress)}
+                      className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-lg py-2 px-4 transition-all hover:scale-105 shadow-md"
+                    >
+                      <Copy size={16} />
+                      <span className="font-semibold text-sm">Copiar Dirección</span>
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Payment Form - 3/5 del espacio */}
+            <div className="lg:col-span-3">
+              <Card className="shadow-2xl border-2 border-blue-200 dark:border-blue-800">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-b border-blue-200 dark:border-blue-800">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <Wallet className="w-6 h-6 text-blue-600" />
+                        Realizar Pago
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        Paga tu deuda a través de Stellar Blockchain
+                      </p>
+                    </div>
+                    <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center">
+                      <CreditCard className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <form onSubmit={handlePayment} className="space-y-6">
+                    {/* Monto a pagar */}
+                    <div>
+                      <Label required className="text-base">Monto a pagar (MXN)</Label>
+                      <div className="relative mt-2">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                          <DollarSign className={`w-6 h-6 transition-colors ${
+                            focusedField === 'amount' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'
+                          }`} />
+                        </div>
+                        <Input
+                          type="number"
+                          placeholder="0.00"
+                          step="0.01"
+                          min="0.01"
+                          max={debtor.totalDebt}
+                          value={paymentAmount}
+                          onChange={handleAmountChange}
+                          onFocus={() => setFocusedField('amount')}
+                          onBlur={() => setFocusedField(null)}
+                          disabled={processing}
+                          className={`pl-14 pr-4 py-4 text-lg font-semibold border-2 transition-all ${
+                            amountError
+                              ? 'border-red-500 focus:border-red-600'
+                              : focusedField === 'amount'
+                              ? 'border-blue-500 shadow-lg shadow-blue-500/20'
+                              : 'border-gray-300 dark:border-gray-600'
+                          }`}
+                        />
+                      </div>
+                      {amountError ? (
+                        <p className="text-sm text-red-600 dark:text-red-400 mt-2 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" />
+                          {amountError}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                          Máximo: <span className="font-semibold">{formatCurrency(debtor.totalDebt)}</span>
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Preview del pago */}
+                    {paymentAmount && !amountError && parseFloat(paymentAmount) > 0 && (
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-6 border-2 border-green-200 dark:border-green-700 animate-fadeIn">
+                        <div className="flex items-center gap-2 mb-4">
+                          <TrendingDown className="w-5 h-5 text-green-600 dark:text-green-400" />
+                          <h4 className="text-sm font-bold text-green-700 dark:text-green-300 uppercase">Vista Previa del Pago</h4>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-xs text-green-600 dark:text-green-400 mb-1">Pagarás</p>
+                            <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                              {formatCurrency(parseFloat(paymentAmount))}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-green-600 dark:text-green-400 mb-1">Deuda restante</p>
+                            <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                              {formatCurrency(remainingDebt)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-green-200 dark:border-green-700">
+                          <div className="flex items-center justify-between text-sm mb-2">
+                            <span className="text-green-700 dark:text-green-300 font-medium">Reducción de deuda</span>
+                            <span className="text-green-700 dark:text-green-300 font-bold">{percentagePaid}%</span>
+                          </div>
+                          <div className="w-full bg-green-200 dark:bg-green-900/50 rounded-full h-3 overflow-hidden">
+                            <div
+                              className="bg-gradient-to-r from-green-500 to-emerald-600 h-full transition-all duration-500 rounded-full"
+                              style={{ width: `${Math.min(100, percentagePaid)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Referencia */}
+                    <div>
+                      <Label required className="text-base">Referencia / Concepto</Label>
+                      <div className="relative mt-2">
+                        <Input
+                          type="text"
+                          placeholder="Ej: Pago parcial abono 1"
+                          value={txReference}
+                          onChange={handleReferenceChange}
+                          onFocus={() => setFocusedField('reference')}
+                          onBlur={() => setFocusedField(null)}
+                          disabled={processing}
+                          className={`pr-4 py-4 text-base border-2 transition-all ${
+                            referenceError
+                              ? 'border-red-500 focus:border-red-600'
+                              : focusedField === 'reference'
+                              ? 'border-blue-500 shadow-lg shadow-blue-500/20'
+                              : 'border-gray-300 dark:border-gray-600'
+                          }`}
+                        />
+                      </div>
+                      {referenceError && (
+                        <p className="text-sm text-red-600 dark:text-red-400 mt-2 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" />
+                          {referenceError}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Wallet de destino */}
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-700">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Wallet className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-bold text-purple-700 dark:text-purple-300 mb-2">
+                            Wallet de Destino
+                          </p>
+                          <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3 mb-2">
+                            <code className="text-sm font-mono text-purple-900 dark:text-purple-100 break-all block">
+                              {businessData.walletAddress}
+                            </code>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(businessData.walletAddress)}
+                            className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-semibold flex items-center gap-1 transition-colors"
+                          >
+                            <Copy size={14} />
+                            Copiar dirección
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Info importante */}
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-200 dark:border-yellow-800 rounded-2xl p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Info className="w-6 h-6 text-yellow-700 dark:text-yellow-400" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-yellow-900 dark:text-yellow-100 mb-2">Importante:</p>
+                          <ul className="space-y-2 text-sm text-yellow-800 dark:text-yellow-200">
+                            <li className="flex items-start gap-2">
+                              <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                              <span>El pago será registrado en la blockchain Stellar</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                              <span>Tu pago entrará en estado de <strong>revisión</strong></span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                              <span>El administrador lo verificará en 24-48 horas</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                              <span>Recibirás confirmación una vez aprobado</span>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Botón de pago */}
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      size="xl"
+                      className="w-full shadow-2xl hover:shadow-blue-500/50 transition-all hover:scale-105"
+                      disabled={processing || !!amountError || !!referenceError}
+                    >
+                      {processing ? (
+                        <>
+                          <Loader2 className="w-6 h-6 animate-spin" />
+                          <span className="text-lg">Procesando en Stellar...</span>
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck size={24} />
+                          <span className="text-lg font-bold">Pagar con Stellar</span>
+                        </>
+                      )}
+                    </Button>
+
+                    <p className="text-xs text-center text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2">
+                      <Lock size={14} />
+                      Transacción segura verificada por Stellar Blockchain
+                    </p>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
