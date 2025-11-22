@@ -9,7 +9,7 @@ export function Chatbot() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: '👋 ¡Hola! Soy el asistente de Levsek. ¿En qué puedo ayudarte hoy?',
+      content: '👋 ¡Hola! Soy el asistente de ISIS. ¿En qué puedo ayudarte hoy?',
       timestamp: new Date(),
     },
   ])

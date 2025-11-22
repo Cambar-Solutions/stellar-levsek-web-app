@@ -1104,7 +1104,7 @@ npm run lint           # Lint código
 
 ## 📄 Licencia
 
-Este proyecto fue desarrollado para el Hackathon Stellar Levsek 2024.
+Este proyecto fue desarrollado para el Hackathon Stellar ISIS 2025.
 
 ---
 
@@ -1112,8 +1112,6 @@ Este proyecto fue desarrollado para el Hackathon Stellar Levsek 2024.
 
 - **Stellar Foundation** - Por la infraestructura blockchain
 - **Soroswap Team** - Por el SDK de DEX
-- **Anthropic** - Por Claude AI
-- **Levsek** - Por organizar el hackathon
 
 ---
 

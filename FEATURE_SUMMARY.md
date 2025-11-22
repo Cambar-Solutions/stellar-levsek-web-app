@@ -166,7 +166,7 @@ const result = await executeSwapAndPay(
    2. Conectar wallet
    3. Swap XLM → USDC
    4. Esperar confirmación (30s)
-   5. Volver a Levsek
+   5. Volver a isis
    6. Registrar pago
    7. Esperar confirmación (30s)
 

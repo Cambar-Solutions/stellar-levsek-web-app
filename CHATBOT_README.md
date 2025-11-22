@@ -1,8 +1,8 @@
-# 🤖 Chatbot Asistente Inteligente - Levsek
+# 🤖 Chatbot Asistente Inteligente - ISIS
 
 ## 🎯 Descripción
 
-El chatbot es un **asistente virtual profesional** integrado en la aplicación Levsek que ayuda a los usuarios a resolver dudas sobre el uso del sistema de gestión de deudas.
+El chatbot es un **asistente virtual profesional** integrado en la aplicación ISIS que ayuda a los usuarios a resolver dudas sobre el uso del sistema de gestión de deudas.
 
 ### Características Principales:
 
@@ -388,6 +388,6 @@ Edita `src/services/chatbotService.js` y agrega nuevas keywords:
 
 ## 🎉 ¡Listo!
 
-El chatbot está completamente funcional y listo para ayudar a tus usuarios. Es inteligente, profesional y conoce todo sobre el sistema Levsek.
+El chatbot está completamente funcional y listo para ayudar a tus usuarios. Es inteligente, profesional y conoce todo sobre el sistema ISIS.
 
 **¡Pruébalo ahora mismo!** Haz clic en el botón morado flotante 🤖

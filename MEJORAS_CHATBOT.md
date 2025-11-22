@@ -1,8 +1,8 @@
-# 🤖 Mejoras del Chatbot Levsek - Sistema Inteligente con Validación de Sesión
+# 🤖 Mejoras del Chatbot ISIS - Sistema Inteligente con Validación de Sesión
 
 ## 📋 Resumen de Cambios
 
-Se ha mejorado completamente el chatbot del sistema Levsek con las siguientes características principales:
+Se ha mejorado completamente el chatbot del sistema ISIS con las siguientes características principales:
 
 ### ✅ Características Implementadas
 
@@ -458,7 +458,7 @@ Hover: rgba(102, 126, 234, 0.6)
 
 ## 🏆 Conclusión
 
-El chatbot de Levsek ahora es un **asistente inteligente de nivel empresarial** con:
+El chatbot de ISIS ahora es un **asistente inteligente de nivel empresarial** con:
 
 ✅ **Seguridad** - Validación de sesión automática
 ✅ **Inteligencia** - 50+ respuestas contextuales
@@ -470,6 +470,6 @@ El sistema ahora distingue perfectamente entre administradores y clientes, propo
 
 ---
 
-**Desarrollado con 💜 por el equipo de Levsek**
+**Desarrollado con 💜 por el equipo de ISIS**
 
 *Última actualización: 2025*

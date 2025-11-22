@@ -349,7 +349,7 @@ Por favor, proporciona más detalles sobre el error:
     }
 
     // Respuesta por defecto si no hay coincidencia
-    return `🤖 **Asistente Levsek**
+    return `🤖 **Asistente ISIS**
 
 Puedo ayudarte con:
 

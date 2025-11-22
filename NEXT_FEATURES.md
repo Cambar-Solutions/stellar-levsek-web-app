@@ -1,4 +1,4 @@
-# 🚀 Próximas Funcionalidades - Levsek DeFi
+# 🚀 Próximas Funcionalidades - ISIS DeFi
 
 ## 🎯 Top 3 Recomendaciones (Ordenadas por Impacto)
 
