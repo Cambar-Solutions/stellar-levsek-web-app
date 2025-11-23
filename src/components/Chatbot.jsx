@@ -9,7 +9,7 @@ export function Chatbot() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: '👋 ¡Hola! Soy el asistente de ISIS. ¿En qué puedo ayudarte hoy?',
+      content: '👋 Hello! I\'m the ISIS assistant. How can I help you today?',
       timestamp: new Date(),
     },
   ])
@@ -67,7 +67,7 @@ export function Chatbot() {
       console.error('Error sending message:', error)
       const errorMessage = {
         role: 'assistant',
-        content: '❌ Lo siento, ocurrió un error. Por favor intenta de nuevo.',
+        content: '❌ Sorry, an error occurred. Please try again.',
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, errorMessage])
@@ -98,7 +98,7 @@ export function Chatbot() {
         <button
           onClick={() => setIsOpen(true)}
           className="chatbot-fab"
-          aria-label="Abrir chat de ayuda"
+          aria-label="Open help chat"
         >
           <MessageCircle size={24} />
         </button>
@@ -114,17 +114,17 @@ export function Chatbot() {
                 <MessageCircle size={20} />
               </div>
               <div>
-                <h3 className="chatbot-title">ISIS BOT IA</h3>
+                <h3 className="chatbot-title">ISIS AI BOT</h3>
                 <p className="chatbot-subtitle">
                   <span className="chatbot-status-dot"></span>
-                  En línea
+                  Online
                 </p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
               className="chatbot-close-btn"
-              aria-label="Cerrar chat"
+              aria-label="Close chat"
             >
               <X size={20} />
             </button>
@@ -180,7 +180,7 @@ export function Chatbot() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Escribe tu pregunta..."
+              placeholder="Type your question..."
               className="chatbot-input"
               disabled={isLoading}
             />
@@ -188,7 +188,7 @@ export function Chatbot() {
               type="submit"
               disabled={!input.trim() || isLoading}
               className="chatbot-send-btn"
-              aria-label="Enviar mensaje"
+              aria-label="Send message"
             >
               {isLoading ? (
                 <Loader2 size={20} className="animate-spin" />
@@ -202,27 +202,27 @@ export function Chatbot() {
           <div className="chatbot-quick-actions">
             <button
               onClick={() =>
-                setInput('¿Cómo realizar un pago?')
+                setInput('How to make a payment?')
               }
               className="chatbot-quick-btn"
             >
-              💳 Cómo pagar
+              💳 How to pay
             </button>
             <button
               onClick={() =>
-                setInput('¿Cómo aprobar pagos pendientes?')
+                setInput('How to approve pending payments?')
               }
               className="chatbot-quick-btn"
             >
-              ✅ Aprobar pagos
+              ✅ Approve payments
             </button>
             <button
               onClick={() =>
-                setInput('¿Cómo registrar una deuda?')
+                setInput('How to register a debt?')
               }
               className="chatbot-quick-btn"
             >
-              📊 Registrar deuda
+              📊 Register debt
             </button>
           </div>
         </div>

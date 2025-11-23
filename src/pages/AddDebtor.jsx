@@ -45,15 +45,15 @@ export function AddDebtor() {
     const newErrors = {}
 
     if (mode === 'new') {
-      if (!formData.name) newErrors.name = 'El nombre es requerido'
-      if (!formData.email) newErrors.email = 'El correo es requerido'
+      if (!formData.name) newErrors.name = 'Name is required'
+      if (!formData.email) newErrors.email = 'Email is required'
     } else {
-      if (!selectedCustomer) newErrors.customer = 'Selecciona un cliente'
+      if (!selectedCustomer) newErrors.customer = 'Select a customer'
     }
 
-    // El monto de deuda ya NO es requerido
+    // Debt amount is NOT required
     if (formData.totalDebt && parseFloat(formData.totalDebt) < 0) {
-      newErrors.totalDebt = 'El monto no puede ser negativo'
+      newErrors.totalDebt = 'Amount cannot be negative'
     }
 
     setErrors(newErrors)
@@ -69,7 +69,7 @@ export function AddDebtor() {
 
     try {
       if (mode === 'select' && selectedCustomer) {
-        // Crear deuda para cliente existente
+        // Create debt for existing customer
         const debtAmount = parseFloat(formData.totalDebt) || 0
 
         if (debtAmount > 0) {
@@ -78,27 +78,27 @@ export function AddDebtor() {
             customerId: selectedCustomer.id,
             createdByUserId: Number(user.id) || 1,
             totalAmount: debtAmount,
-            description: formData.description || 'Deuda registrada',
+            description: formData.description || 'Debt registered',
           })
-          // Recargar datos para reflejar la nueva deuda
+          // Reload data to reflect the new debt
           await reloadData()
-          toast.success('Deuda registrada exitosamente')
+          toast.success('Debt registered successfully')
         } else {
-          toast.info('Cliente seleccionado (sin deuda nueva)')
+          toast.info('Customer selected (no new debt)')
         }
       } else {
-        // Crear nuevo cliente y deuda
+        // Create new customer and debt
         await addDebtor({
           ...formData,
           totalDebt: parseFloat(formData.totalDebt) || 0,
-          description: formData.description || 'Deuda inicial',
+          description: formData.description || 'Initial debt',
         })
       }
 
       navigate('/dashboard')
     } catch (error) {
       console.error('Error:', error)
-      toast.error(error.message || 'Error al procesar')
+      toast.error(error.message || 'Error processing')
     } finally {
       setLoading(false)
     }
@@ -114,16 +114,16 @@ export function AddDebtor() {
           className="mb-6 flex items-center gap-2"
         >
           <ArrowLeft size={18} />
-          Volver al Dashboard
+          Back to Dashboard
         </Button>
 
         <Card>
           <CardHeader>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Registrar Deuda
+              Register Debt
             </h2>
             <p className="text-gray-600 dark:text-gray-300 mt-1">
-              Selecciona un cliente existente o crea uno nuevo
+              Select an existing customer or create a new one
             </p>
           </CardHeader>
           <CardContent className="p-6">
@@ -139,7 +139,7 @@ export function AddDebtor() {
                 }`}
               >
                 <UserCheck className="inline-block w-5 h-5 mr-2" />
-                Cliente Existente
+                Existing Customer
               </button>
               <button
                 type="button"
@@ -151,7 +151,7 @@ export function AddDebtor() {
                 }`}
               >
                 <User className="inline-block w-5 h-5 mr-2" />
-                Cliente Nuevo
+                New Customer
               </button>
             </div>
 
@@ -159,7 +159,7 @@ export function AddDebtor() {
               {mode === 'select' ? (
                 /* Select Existing Customer */
                 <div>
-                  <Label required>Seleccionar Cliente</Label>
+                  <Label required>Select Customer</Label>
                   <select
                     value={selectedCustomer?.id || ''}
                     onChange={(e) => {
@@ -170,7 +170,7 @@ export function AddDebtor() {
                     }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">-- Selecciona un cliente --</option>
+                    <option value="">-- Select a customer --</option>
                     {customers.map((customer) => (
                       <option key={customer.id} value={customer.id}>
                         {customer.name} {customer.last_name} - {customer.email}
@@ -185,10 +185,10 @@ export function AddDebtor() {
                 /* New Customer Fields */
                 <>
                   <div>
-                    <Label required>Nombre completo</Label>
+                    <Label required>Full name</Label>
                     <Input
                       type="text"
-                      placeholder="Juan Pérez García"
+                      placeholder="John Doe"
                       icon={User}
                       value={formData.name}
                       onChange={(e) =>
@@ -199,10 +199,10 @@ export function AddDebtor() {
                   </div>
 
                   <div>
-                    <Label required>Correo electrónico</Label>
+                    <Label required>Email address</Label>
                     <Input
                       type="email"
-                      placeholder="juan@email.com"
+                      placeholder="john@email.com"
                       icon={Mail}
                       value={formData.email}
                       onChange={(e) =>
@@ -213,7 +213,7 @@ export function AddDebtor() {
                   </div>
 
                   <div>
-                    <Label>Teléfono</Label>
+                    <Label>Phone</Label>
                     <Input
                       type="tel"
                       placeholder="+52 555 123 4567"
@@ -229,7 +229,7 @@ export function AddDebtor() {
 
               {/* Debt Amount (Optional) */}
               <div>
-                <Label>Monto de la deuda (MXN) - Opcional</Label>
+                <Label>Debt amount (MXN) - Optional</Label>
                 <Input
                   type="number"
                   placeholder="0.00"
@@ -243,15 +243,15 @@ export function AddDebtor() {
                   error={errors.totalDebt}
                 />
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Deja en blanco si no hay deuda inicial
+                  Leave blank if there is no initial debt
                 </p>
               </div>
 
               {/* Description */}
               <div>
-                <Label>Descripción / Concepto</Label>
+                <Label>Description / Concept</Label>
                 <textarea
-                  placeholder="Motivo de la deuda..."
+                  placeholder="Reason for the debt..."
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
@@ -268,7 +268,7 @@ export function AddDebtor() {
                   onClick={() => navigate('/dashboard')}
                   className="flex-1"
                 >
-                  Cancelar
+                  Cancel
                 </Button>
                 <Button
                   type="submit"
@@ -277,7 +277,7 @@ export function AddDebtor() {
                   className="flex-1"
                   disabled={loading}
                 >
-                  {loading ? 'Procesando...' : 'Registrar'}
+                  {loading ? 'Processing...' : 'Register'}
                 </Button>
               </div>
             </form>

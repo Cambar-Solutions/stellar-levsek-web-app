@@ -43,30 +43,30 @@ export function Debtors() {
   }
 
   const canDeleteDebtor = (debtor) => {
-    // No se puede eliminar si tiene deudas pendientes o pagos registrados
+    // Cannot delete if they have outstanding debts or registered payments
     return debtor.totalDebt === 0 && debtor.payments.length === 0
   }
 
   const handleDelete = async (id, name, debtor) => {
     if (!canDeleteDebtor(debtor)) {
-      toast.error('No se puede eliminar un deudor con deudas o pagos registrados')
+      toast.error('Cannot delete a debtor with outstanding debts or registered payments')
       return
     }
 
     const confirmed = await confirm({
-      title: 'Eliminar deudor',
-      message: `¿Estás seguro de eliminar a ${name}? Esta acción no se puede deshacer.`,
+      title: 'Delete debtor',
+      message: `Are you sure you want to delete ${name}? This action cannot be undone.`,
       type: 'danger',
-      confirmText: 'Eliminar',
-      cancelText: 'Cancelar'
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
     })
 
     if (confirmed) {
       try {
         await deleteDebtor(id)
       } catch (error) {
-        // El error ya se muestra en DebtContext, solo logueamos aquí
-        console.error('Error en handleDelete:', error)
+        // Error is already shown in DebtContext, just log it here
+        console.error('Error in handleDelete:', error)
       }
     }
   }
@@ -78,16 +78,16 @@ export function Debtors() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Gestión de Deudores
+            Debtor Management
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
-            Administra todos los deudores de tu negocio
+            Manage all your business debtors
           </p>
         </div>
         <Link to="/debtors/add">
           <Button variant="primary" size="lg" className="flex items-center gap-2">
             <Plus size={20} />
-            Agregar Deudor
+            Add Debtor
           </Button>
         </Link>
       </div>
@@ -96,7 +96,7 @@ export function Debtors() {
       <Card className="mb-6">
         <CardContent className="p-6">
           <Input
-            placeholder="Buscar por nombre o email..."
+            placeholder="Search by name or email..."
             icon={Search}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -112,12 +112,12 @@ export function Debtors() {
               <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
             </div>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              {searchQuery ? 'No se encontraron deudores' : 'No tienes deudores registrados'}
+              {searchQuery ? 'No debtors found' : 'You have no registered debtors'}
             </p>
             <Link to="/debtors/add">
               <Button variant="primary">
                 <Plus size={18} />
-                Agregar Primer Deudor
+                Add First Debtor
               </Button>
             </Link>
           </CardContent>
@@ -145,7 +145,7 @@ export function Debtors() {
 
                 {/* Amount */}
                 <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 mb-4">
-                  <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Saldo Pendiente</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Outstanding Balance</p>
                   <p
                     className={`text-2xl font-bold ${
                       debtor.totalDebt > 4000
@@ -162,23 +162,23 @@ export function Debtors() {
                 {/* Info */}
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-300">Estado:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Status:</span>
                     <Badge
                       variant={
                         debtor.status === 'verified' ? 'verified' : 'pending'
                       }
                     >
-                      {debtor.status === 'verified' ? 'Verificado' : 'Pendiente'}
+                      {debtor.status === 'verified' ? 'Verified' : 'Pending'}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-300">Pagos:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Payments:</span>
                     <span className="font-semibold text-gray-900 dark:text-white">
                       {debtor.payments.length}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-300">Desde:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Since:</span>
                     <span className="font-semibold text-gray-900 dark:text-white">
                       {formatDate(debtor.createdAt)}
                     </span>
@@ -194,7 +194,7 @@ export function Debtors() {
                       className="w-full flex items-center justify-center gap-2"
                     >
                       <Eye size={16} />
-                      Ver Detalle
+                      View Details
                     </Button>
                   </Link>
                   <Button
@@ -209,8 +209,8 @@ export function Debtors() {
                     }`}
                     title={
                       !canDeleteDebtor(debtor)
-                        ? 'No se puede eliminar: tiene deudas o pagos registrados'
-                        : 'Eliminar deudor'
+                        ? 'Cannot delete: has outstanding debts or registered payments'
+                        : 'Delete debtor'
                     }
                   >
                     <Trash2 size={16} />

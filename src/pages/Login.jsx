@@ -25,18 +25,18 @@ export function Login() {
     switch (name) {
       case 'email':
         if (!value) {
-          newErrors.email = 'El correo electrónico es requerido'
+          newErrors.email = 'Email is required'
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          newErrors.email = 'Por favor ingresa un correo electrónico válido'
+          newErrors.email = 'Please enter a valid email address'
         } else {
           delete newErrors.email
         }
         break
       case 'password':
         if (!value) {
-          newErrors.password = 'La contraseña es requerida'
+          newErrors.password = 'Password is required'
         } else if (value.length < 8) {
-          newErrors.password = 'La contraseña debe tener al menos 8 caracteres'
+          newErrors.password = 'Password must be at least 8 characters'
         } else {
           delete newErrors.password
         }
@@ -92,7 +92,7 @@ export function Login() {
       navigate('/dashboard')
     } else {
       setErrors({
-        submit: result.error || 'Error al iniciar sesión. Por favor verifica tus credenciales.'
+        submit: result.error || 'Login error. Please verify your credentials.'
       })
     }
 
@@ -122,25 +122,25 @@ export function Login() {
             </h1>
 
             <p className="text-xl text-blue-100">
-              Administra las deudas de tu negocio con la seguridad y transparencia de blockchain
+              Manage your business debts with blockchain security and transparency
             </p>
           </div>
 
           <div className="space-y-4">
             <FeatureItem
               icon={<Wallet className="w-6 h-6" />}
-              title="Pagos en Blockchain"
-              description="Registros inmutables y verificables"
+              title="Blockchain Payments"
+              description="Immutable and verifiable records"
             />
             <FeatureItem
               icon={<Users className="w-6 h-6" />}
-              title="Gestión de Deudores"
-              description="Control total de tus cuentas por cobrar"
+              title="Debtor Management"
+              description="Full control of your accounts receivable"
             />
             <FeatureItem
               icon={<TrendingUp className="w-6 h-6" />}
-              title="Estadísticas Avanzadas"
-              description="Visualiza el estado financiero en tiempo real"
+              title="Advanced Statistics"
+              description="Visualize financial status in real-time"
             />
           </div>
         </div>
@@ -156,18 +156,18 @@ export function Login() {
                   className="w-20 h-20 object-contain"
                 />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Bienvenido</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Inicia sesión en tu cuenta</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Sign in to your account</p>
             </div>
 
-            {/* Error general de envío */}
+            {/* General submission error */}
             {errors.submit && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-red-800">{errors.submit}</p>
                   <p className="text-xs text-red-600 mt-1">
-                    Verifica que tu correo y contraseña sean correctos
+                    Verify that your email and password are correct
                   </p>
                 </div>
               </div>
@@ -175,10 +175,10 @@ export function Login() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <Label required>Correo electrónico</Label>
+                <Label required>Email</Label>
                 <Input
                   type="email"
-                  placeholder="ejemplo@correo.com"
+                  placeholder="example@email.com"
                   icon={Mail}
                   value={formData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
@@ -198,7 +198,7 @@ export function Login() {
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <Label required>Contraseña</Label>
+                  <Label required>Password</Label>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -207,19 +207,19 @@ export function Login() {
                     {showPassword ? (
                       <>
                         <EyeOff className="w-3.5 h-3.5" />
-                        Ocultar
+                        Hide
                       </>
                     ) : (
                       <>
                         <Eye className="w-3.5 h-3.5" />
-                        Mostrar
+                        Show
                       </>
                     )}
                   </button>
                 </div>
                 <Input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Mínimo 8 caracteres"
+                  placeholder="Minimum 8 characters"
                   icon={Lock}
                   value={formData.password}
                   onChange={(e) => handleChange('password', e.target.value)}
@@ -250,19 +250,19 @@ export function Login() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    Ingresando...
+                    Signing in...
                   </>
                 ) : (
-                  'Ingresar'
+                  'Sign In'
                 )}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                ¿No tienes cuenta?{' '}
+                Don't have an account?{' '}
                 <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-700">
-                  Regístrate aquí
+                  Sign up here
                 </Link>
               </p>
             </div>

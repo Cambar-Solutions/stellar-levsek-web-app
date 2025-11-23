@@ -9,7 +9,7 @@ import { Mail, Lock, User, Building2, ShieldCheck, Sparkles, ArrowRight, ArrowLe
 
 const STEPS = [
   { id: 'personal', label: 'Personal' },
-  { id: 'security', label: 'Seguridad' },
+  { id: 'security', label: 'Security' },
 ]
 
 export function Register() {
@@ -35,36 +35,36 @@ export function Register() {
     switch (name) {
       case 'name':
         if (!value) {
-          newErrors.name = 'El nombre completo es requerido'
+          newErrors.name = 'Full name is required'
         } else if (value.length < 3) {
-          newErrors.name = 'El nombre debe tener al menos 3 caracteres'
+          newErrors.name = 'Name must be at least 3 characters'
         } else {
           delete newErrors.name
         }
         break
       case 'email':
         if (!value) {
-          newErrors.email = 'El correo electrónico es requerido'
+          newErrors.email = 'Email is required'
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          newErrors.email = 'Por favor ingresa un correo electrónico válido'
+          newErrors.email = 'Please enter a valid email address'
         } else {
           delete newErrors.email
         }
         break
       case 'password':
         if (!value) {
-          newErrors.password = 'La contraseña es requerida'
+          newErrors.password = 'Password is required'
         } else if (value.length < 8) {
-          newErrors.password = 'La contraseña debe tener al menos 8 caracteres'
+          newErrors.password = 'Password must be at least 8 characters'
         } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
-          newErrors.password = 'Debe contener mayúsculas, minúsculas y números'
+          newErrors.password = 'Must contain uppercase, lowercase and numbers'
         } else {
           delete newErrors.password
         }
         // Re-validar confirmación si ya fue tocada
         if (touched.confirmPassword && formData.confirmPassword) {
           if (value !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Las contraseñas no coinciden'
+            newErrors.confirmPassword = 'Passwords do not match'
           } else {
             delete newErrors.confirmPassword
           }
@@ -72,9 +72,9 @@ export function Register() {
         break
       case 'confirmPassword':
         if (!value) {
-          newErrors.confirmPassword = 'Debes confirmar tu contraseña'
+          newErrors.confirmPassword = 'You must confirm your password'
         } else if (value !== formData.password) {
-          newErrors.confirmPassword = 'Las contraseñas no coinciden'
+          newErrors.confirmPassword = 'Passwords do not match'
         } else {
           delete newErrors.confirmPassword
         }
@@ -152,7 +152,7 @@ export function Register() {
       navigate('/dashboard')
     } else {
       setErrors({
-        submit: result.error || 'Error al crear la cuenta. Por favor intenta de nuevo.'
+        submit: result.error || 'Error creating account. Please try again.'
       })
     }
 
@@ -189,26 +189,26 @@ export function Register() {
               className="text inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors group"
             >
               <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
-              <span className="text-md font-medium">Volver</span>
+              <span className="text-md font-medium">Back</span>
             </Link>
 
             <h1 className="text-5xl font-bold leading-tight">
-              Crea tu cuenta
+              Create your account
             </h1>
 
             <p className="text-xl text-purple-100">
-              Comienza a gestionar deudas con transparencia blockchain
+              Start managing debts with blockchain transparency
             </p>
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 space-y-4">
-            <h3 className="font-semibold text-lg">¿Qué obtienes?</h3>
+            <h3 className="font-semibold text-lg">What do you get?</h3>
             <ul className="space-y-3">
-              <BenefitItem text="Wallet Stellar generada automáticamente" />
-              <BenefitItem text="Panel de control completo" />
-              <BenefitItem text="Registro inmutable de transacciones" />
-              <BenefitItem text="URL pública para transparencia" />
-              <BenefitItem text="Estadísticas en tiempo real" />
+              <BenefitItem text="Automatically generated Stellar Wallet" />
+              <BenefitItem text="Complete dashboard" />
+              <BenefitItem text="Immutable transaction record" />
+              <BenefitItem text="Public URL for transparency" />
+              <BenefitItem text="Real-time statistics" />
             </ul>
           </div>
         </div>
@@ -224,13 +224,13 @@ export function Register() {
                   className="w-20 h-20 object-contain"
                 />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Crear Cuenta</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create Account</h2>
             </div>
 
-            {/* Indicador de progreso */}
+            {/* Progress indicator */}
             <StepProgress steps={STEPS} currentStep={currentStep} />
 
-            {/* Error general */}
+            {/* General error */}
             {errors.submit && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
@@ -239,14 +239,14 @@ export function Register() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Paso 1: Información Personal */}
+              {/* Step 1: Personal Information */}
               {currentStep === 1 && (
                 <div className="space-y-4 animate-fadeIn">
                   <div>
-                    <Label required>Nombre completo</Label>
+                    <Label required>Full name</Label>
                     <Input
                       type="text"
-                      placeholder="Ej: Juan Pérez García"
+                      placeholder="E.g.: John Smith"
                       icon={User}
                       value={formData.name}
                       onChange={(e) => handleChange('name', e.target.value)}
@@ -266,10 +266,10 @@ export function Register() {
                   </div>
 
                   <div>
-                    <Label required>Correo electrónico</Label>
+                    <Label required>Email</Label>
                     <Input
                       type="email"
-                      placeholder="ejemplo@correo.com"
+                      placeholder="example@email.com"
                       icon={Mail}
                       value={formData.email}
                       onChange={(e) => handleChange('email', e.target.value)}
@@ -291,12 +291,12 @@ export function Register() {
                 </div>
               )}
 
-              {/* Paso 2: Seguridad (Contraseñas) */}
+              {/* Step 2: Security (Passwords) */}
               {currentStep === 2 && (
                 <div className="space-y-4 animate-fadeIn">
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <Label required>Contraseña</Label>
+                      <Label required>Password</Label>
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
@@ -305,19 +305,19 @@ export function Register() {
                         {showPassword ? (
                           <>
                             <EyeOff className="w-3.5 h-3.5" />
-                            Ocultar
+                            Hide
                           </>
                         ) : (
                           <>
                             <Eye className="w-3.5 h-3.5" />
-                            Mostrar
+                            Show
                           </>
                         )}
                       </button>
                     </div>
                     <Input
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="Mínimo 8 caracteres"
+                      placeholder="Minimum 8 characters"
                       icon={Lock}
                       value={formData.password}
                       onChange={(e) => handleChange('password', e.target.value)}
@@ -337,9 +337,9 @@ export function Register() {
                   </div>
 
                   <div>
-                    
+
                     <div className="flex items-center justify-between mb-1">
-                      <Label required>Confirmar contraseña</Label>
+                      <Label required>Confirm password</Label>
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -349,19 +349,19 @@ export function Register() {
                         {showConfirmPassword ? (
                           <>
                             <EyeOff className="w-3.5 h-3.5" />
-                            Ocultar
+                            Hide
                           </>
                         ) : (
                           <>
                             <Eye className="w-3.5 h-3.5" />
-                            Mostrar
+                            Show
                           </>
                         )}
                       </button>
                     </div>
                     <Input
                       type={showConfirmPassword ? 'text' : 'password'}
-                      placeholder="Confirma tu contraseña"
+                      placeholder="Confirm your password"
                       icon={Lock}
                       value={formData.confirmPassword}
                       onChange={(e) => handleChange('confirmPassword', e.target.value)}
@@ -379,7 +379,7 @@ export function Register() {
                       ) : touched.confirmPassword && !errors.confirmPassword && formData.confirmPassword ? (
                         <p className="text-sm text-green-600 flex items-center gap-1">
                           <CheckCircle2 className="w-4 h-4" />
-                          Las contraseñas coinciden
+                          Passwords match
                         </p>
                       ) : null}
                     </div>
@@ -389,7 +389,7 @@ export function Register() {
                 </div>
               )}
 
-              {/* Botones de navegación */}
+              {/* Navigation buttons */}
               <div className="flex items-center gap-3 pt-2">
                 {currentStep > 1 && (
                   <Button
@@ -412,7 +412,7 @@ export function Register() {
                     disabled={!isStepValid()}
                     className="flex-1"
                   >
-                    Siguiente
+                    Next
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 ) : (
@@ -429,12 +429,12 @@ export function Register() {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
-                        Creando cuenta...
+                        Creating account...
                       </>
                     ) : (
                       <>
                         <ShieldCheck className="w-4 h-4" />
-                        Crear Cuenta
+                        Create Account
                       </>
                     )}
                   </Button>
@@ -444,9 +444,9 @@ export function Register() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                ¿Ya tienes cuenta?{' '}
+                Already have an account?{' '}
                 <Link to="/login" className="font-semibold text-purple-600 hover:text-purple-700">
-                  Inicia sesión
+                  Sign in
                 </Link>
               </p>
             </div>

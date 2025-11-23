@@ -54,13 +54,13 @@ export function PublicPayment() {
 
       setBusinessData(data.site)
 
-      // Buscar el deudor específico
+      // Find the specific debtor
       const debtors = data.debtors || []
       const foundDebtor = debtors.find((d) => d.id === debtorId)
       setDebtor(foundDebtor)
     } catch (error) {
       console.error('Error loading public data:', error)
-      toast.error('Error al cargar información del deudor')
+      toast.error('Error loading debtor information')
     } finally {
       setLoading(false)
     }
@@ -75,7 +75,7 @@ export function PublicPayment() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
-    toast.success('Copiado al portapapeles', {
+    toast.success('Copied to clipboard', {
       icon: '📋',
       style: {
         borderRadius: '12px',
@@ -89,17 +89,17 @@ export function PublicPayment() {
     const amount = parseFloat(value)
 
     if (!value || value.trim() === '') {
-      setAmountError('El monto es requerido')
+      setAmountError('Amount is required')
       return false
     }
 
     if (isNaN(amount) || amount <= 0) {
-      setAmountError('Ingresa un monto válido mayor a $0')
+      setAmountError('Enter a valid amount greater than $0')
       return false
     }
 
     if (amount > debtor.totalDebt) {
-      setAmountError(`El monto excede la deuda de ${formatCurrency(debtor.totalDebt)}`)
+      setAmountError(`Amount exceeds debt of ${formatCurrency(debtor.totalDebt)}`)
       return false
     }
 
@@ -109,12 +109,12 @@ export function PublicPayment() {
 
   const validateReference = (value) => {
     if (!value || value.trim() === '') {
-      setReferenceError('La referencia es requerida')
+      setReferenceError('Reference is required')
       return false
     }
 
     if (value.trim().length < 3) {
-      setReferenceError('La referencia debe tener al menos 3 caracteres')
+      setReferenceError('Reference must be at least 3 characters')
       return false
     }
 
@@ -143,12 +143,12 @@ export function PublicPayment() {
   }
 
   const simulateStellarPayment = async (amount) => {
-    // Simulación de pago en Stellar
+    // Stellar payment simulation
     return new Promise((resolve) => {
       setTimeout(() => {
         const txHash = `STELLAR_${Math.random().toString(36).substring(2, 15).toUpperCase()}`
         resolve({ success: true, txHash })
-      }, 2000) // Simula 2 segundos de procesamiento
+      }, 2000) // Simulates 2 seconds of processing
     })
   }
 
@@ -180,12 +180,12 @@ export function PublicPayment() {
   const handlePayment = async (e) => {
     e.preventDefault()
 
-    // Validar ambos campos
+    // Validate both fields
     const isAmountValid = validateAmount(paymentAmount)
     const isReferenceValid = validateReference(txReference)
 
     if (!isAmountValid || !isReferenceValid) {
-      toast.error('Por favor corrige los errores antes de continuar', {
+      toast.error('Please correct the errors before continuing', {
         icon: '⚠️',
       })
       return
@@ -195,53 +195,53 @@ export function PublicPayment() {
     setProcessing(true)
 
     try {
-      // Simular pago en Stellar blockchain
+      // Simulate payment on Stellar blockchain
       const result = await simulateStellarPayment(amount)
 
       if (result.success) {
-        // Obtener las deudas del cliente para encontrar la primera pendiente
+        // Get customer debts to find the first pending one
         const debtsResponse = await getDebtsByCustomer(debtor.id)
         const customerDebts = debtsResponse.data || debtsResponse || []
 
-        // Buscar la primera deuda que no esté completamente pagada
+        // Find the first debt that is not fully paid
         const pendingDebt = customerDebts.find(d => {
           const pending = d.pendingAmount || d.pending_amount || 0
           return pending > 0
         })
 
         if (!pendingDebt) {
-          toast.error('No se encontró una deuda pendiente para este cliente')
+          toast.error('No pending debt found for this customer')
           return
         }
 
-        // Crear pending payment (NO actualiza la deuda todavía)
+        // Create pending payment (does NOT update the debt yet)
         await createPendingPayment({
           debtId: pendingDebt.id,
           customerId: debtor.id,
           amount: amount,
           paymentType: 'stellar',
           reference: txReference,
-          notes: `Pago público desde Stellar - TxHash: ${result.txHash}`,
+          notes: `Public payment from Stellar - TxHash: ${result.txHash}`,
           stellarTxHash: result.txHash
         })
 
         console.log('✅ Pending payment creado en el backend:', result.txHash)
 
-        // Recargar datos para reflejar el nuevo estado
+        // Reload data to reflect the new state
         await loadPublicData()
 
-        // Celebración
+        // Celebration
         celebrateSuccess()
         setPaymentSuccess(true)
 
-        toast.success('¡Pago registrado exitosamente!', {
+        toast.success('Payment registered successfully!', {
           icon: '🎉',
           duration: 4000,
         })
       }
     } catch (error) {
-      console.error('Error al procesar el pago:', error)
-      toast.error('Error al procesar el pago. Por favor intenta de nuevo.', {
+      console.error('Error processing payment:', error)
+      toast.error('Error processing payment. Please try again.', {
         icon: '❌',
       })
     } finally {
@@ -260,10 +260,10 @@ export function PublicPayment() {
             </div>
           </div>
           <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2 animate-pulse">
-            Cargando información de pago...
+            Loading payment information...
           </h2>
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-            Conectando con Stellar Blockchain
+            Connecting to Stellar Blockchain
           </p>
         </div>
       </div>
@@ -278,10 +278,10 @@ export function PublicPayment() {
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
               <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-red-600 dark:text-red-400" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Deudor no encontrado</h2>
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">No se pudo cargar la información del deudor.</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Debtor not found</h2>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">Could not load debtor information.</p>
             <Button onClick={() => navigate(`/public/${siteId}`)} variant="primary" className="mx-auto">
-              Volver al Registro Público
+              Back to Public Registry
             </Button>
           </CardContent>
         </Card>
@@ -300,11 +300,11 @@ export function PublicPayment() {
 
             <div className="mb-6 sm:mb-8">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
-                ¡Pago Registrado Exitosamente! 🎉
+                Payment Registered Successfully! 🎉
               </h2>
               <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300">
-                Tu pago de <span className="font-bold text-green-600 dark:text-green-400">{formatCurrency(parseFloat(paymentAmount))}</span> ha sido
-                registrado en la blockchain de Stellar
+                Your payment of <span className="font-bold text-green-600 dark:text-green-400">{formatCurrency(parseFloat(paymentAmount))}</span> has been
+                registered on the Stellar blockchain
               </p>
             </div>
 
@@ -313,7 +313,7 @@ export function PublicPayment() {
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-2 sm:gap-3 mb-2">
                     <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
-                    <p className="text-xs sm:text-sm font-semibold text-green-700 dark:text-green-300">Monto Pagado</p>
+                    <p className="text-xs sm:text-sm font-semibold text-green-700 dark:text-green-300">Amount Paid</p>
                   </div>
                   <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400">
                     {formatCurrency(parseFloat(paymentAmount))}
@@ -325,7 +325,7 @@ export function PublicPayment() {
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-2 sm:gap-3 mb-2">
                     <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
-                    <p className="text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-300">Deuda Restante (estimada)</p>
+                    <p className="text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-300">Remaining Debt (estimated)</p>
                   </div>
                   <p className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">
                     {formatCurrency(debtor.totalDebt - parseFloat(paymentAmount))}
@@ -342,7 +342,7 @@ export function PublicPayment() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-base sm:text-lg font-bold text-indigo-900 dark:text-indigo-100 mb-2 sm:mb-3">
-                      ¿Qué sigue ahora?
+                      What's next?
                     </h3>
                     <div className="space-y-2 sm:space-y-3">
                       <div className="flex items-start gap-2 sm:gap-3">
@@ -350,7 +350,7 @@ export function PublicPayment() {
                           <span className="text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300">1</span>
                         </div>
                         <p className="text-xs sm:text-sm text-indigo-800 dark:text-indigo-200 pt-1">
-                          Tu pago está ahora <strong className="text-indigo-900 dark:text-indigo-100">en revisión</strong> por el equipo de {businessData.name}
+                          Your payment is now <strong className="text-indigo-900 dark:text-indigo-100">under review</strong> by the {businessData.name} team
                         </p>
                       </div>
                       <div className="flex items-start gap-2 sm:gap-3">
@@ -358,7 +358,7 @@ export function PublicPayment() {
                           <span className="text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300">2</span>
                         </div>
                         <p className="text-xs sm:text-sm text-indigo-800 dark:text-indigo-200 pt-1">
-                          El administrador verificará la transacción en la blockchain de Stellar
+                          The administrator will verify the transaction on the Stellar blockchain
                         </p>
                       </div>
                       <div className="flex items-start gap-2 sm:gap-3">
@@ -366,7 +366,7 @@ export function PublicPayment() {
                           <span className="text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300">3</span>
                         </div>
                         <p className="text-xs sm:text-sm text-indigo-800 dark:text-indigo-200 pt-1">
-                          Una vez aprobado, tu deuda se actualizará automáticamente en el sistema
+                          Once approved, your debt will be automatically updated in the system
                         </p>
                       </div>
                       <div className="flex items-start gap-2 sm:gap-3">
@@ -374,7 +374,7 @@ export function PublicPayment() {
                           <Check className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                         </div>
                         <p className="text-xs sm:text-sm text-indigo-800 dark:text-indigo-200 pt-1">
-                          Tiempo estimado de revisión: <strong className="text-indigo-900 dark:text-indigo-100">24-48 horas</strong>
+                          Estimated review time: <strong className="text-indigo-900 dark:text-indigo-100">24-48 hours</strong>
                         </p>
                       </div>
                     </div>
@@ -390,7 +390,7 @@ export function PublicPayment() {
                 onClick={() => navigate(`/public/${siteId}`)}
                 className="flex-1"
               >
-                Ver Registro Público
+                View Public Registry
               </Button>
               <Button
                 variant="primary"
@@ -398,7 +398,7 @@ export function PublicPayment() {
                 onClick={() => window.location.reload()}
                 className="flex-1 shadow-lg"
               >
-                Realizar Otro Pago
+                Make Another Payment
               </Button>
             </div>
           </CardContent>
@@ -431,7 +431,7 @@ export function PublicPayment() {
                   className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors hover:scale-105 flex-shrink-0"
                 >
                   <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
-                  <span className="font-medium text-sm sm:text-base">Volver</span>
+                  <span className="font-medium text-sm sm:text-base">Back</span>
                 </button>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0">
                   <ShieldCheck className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
@@ -440,12 +440,12 @@ export function PublicPayment() {
                   <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate">
                     {businessData.name}
                   </h1>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">Portal de Pagos Públicos</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">Public Payment Portal</p>
                 </div>
               </div>
               <Badge variant="success" className="flex items-center gap-2 shadow-lg text-xs sm:text-sm flex-shrink-0">
                 <ShieldCheck className="w-3 h-3 sm:w-4 sm:h-4" />
-                Pago Seguro
+                Secure Payment
               </Badge>
             </div>
           </div>
@@ -453,17 +453,17 @@ export function PublicPayment() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Debtor Info - 2/5 del espacio */}
+            {/* Debtor Info - 2/5 of space */}
             <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               <Card className="shadow-xl border-2 border-purple-200 dark:border-purple-800">
                 <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-b border-purple-200 dark:border-purple-800">
                   <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                     <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
-                    Información del Deudor
+                    Debtor Information
                   </h3>
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-                  {/* Avatar y nombre */}
+                  {/* Avatar and name */}
                   <div className="flex items-center gap-3 sm:gap-4 pb-4 border-b border-gray-200 dark:border-gray-700">
                     <div className="relative flex-shrink-0">
                       <Avatar name={debtor.name} size="xl" />
@@ -477,12 +477,12 @@ export function PublicPayment() {
                     </div>
                   </div>
 
-                  {/* Deuda actual */}
+                  {/* Current debt */}
                   <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-5 border-2 border-red-200 dark:border-red-800">
                     <div className="flex items-center gap-2 mb-2 sm:mb-3">
                       <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400 flex-shrink-0" />
                       <p className="text-xs sm:text-sm font-bold text-red-700 dark:text-red-300 uppercase tracking-wider">
-                        Saldo Pendiente Actual
+                        Current Outstanding Balance
                       </p>
                     </div>
                     <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-red-600 dark:text-red-400 mb-2 break-words">
@@ -490,7 +490,7 @@ export function PublicPayment() {
                     </p>
                     <div className="flex items-center gap-2 text-xs sm:text-sm text-red-600 dark:text-red-400">
                       <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse flex-shrink-0"></div>
-                      <span>Deuda activa</span>
+                      <span>Active debt</span>
                     </div>
                   </div>
 
@@ -498,14 +498,14 @@ export function PublicPayment() {
                   <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 sm:p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
-                      <p className="text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase">Cuenta</p>
+                      <p className="text-xs sm:text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase">Account</p>
                     </div>
                     <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">
                       {debtor.accountType}
                     </p>
                   </div>
 
-                  {/* Wallet address - MEJORADO con word-break */}
+                  {/* Wallet address - IMPROVED with word-break */}
                   <div className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-xl p-3 sm:p-4 border border-indigo-200 dark:border-indigo-800">
                     <div className="flex items-center gap-2 mb-2 sm:mb-3">
                       <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
@@ -521,14 +521,14 @@ export function PublicPayment() {
                       className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-lg py-2 px-3 sm:px-4 transition-all hover:scale-105 shadow-md"
                     >
                       <Copy size={14} className="sm:w-4 sm:h-4" />
-                      <span className="font-semibold text-xs sm:text-sm">Copiar Dirección</span>
+                      <span className="font-semibold text-xs sm:text-sm">Copy Address</span>
                     </button>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Payment Form - 3/5 del espacio */}
+            {/* Payment Form - 3/5 of space */}
             <div className="lg:col-span-3">
               <Card className="shadow-2xl border-2 border-blue-200 dark:border-blue-800">
                 <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-b border-blue-200 dark:border-blue-800">
@@ -536,10 +536,10 @@ export function PublicPayment() {
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <Wallet className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0" />
-                        <span>Realizar Pago</span>
+                        <span>Make Payment</span>
                       </h3>
                       <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        Paga tu deuda a través de Stellar Blockchain
+                        Pay your debt through Stellar Blockchain
                       </p>
                     </div>
                     <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 dark:bg-blue-900/30 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0">
@@ -549,9 +549,9 @@ export function PublicPayment() {
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6 md:p-8">
                   <form onSubmit={handlePayment} className="space-y-4 sm:space-y-6">
-                    {/* Monto a pagar */}
+                    {/* Amount to pay */}
                     <div>
-                      <Label required className="text-sm sm:text-base">Monto a pagar (MXN)</Label>
+                      <Label required className="text-sm sm:text-base">Amount to pay (MXN)</Label>
                       <div className="relative mt-2">
                         <div className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2">
                           <DollarSign className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${
@@ -585,27 +585,27 @@ export function PublicPayment() {
                         </p>
                       ) : (
                         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-2">
-                          Máximo: <span className="font-semibold">{formatCurrency(debtor.totalDebt)}</span>
+                          Maximum: <span className="font-semibold">{formatCurrency(debtor.totalDebt)}</span>
                         </p>
                       )}
                     </div>
 
-                    {/* Preview del pago */}
+                    {/* Payment preview */}
                     {paymentAmount && !amountError && parseFloat(paymentAmount) > 0 && (
                       <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-green-200 dark:border-green-700 animate-fadeIn">
                         <div className="flex items-center gap-2 mb-3 sm:mb-4">
                           <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
-                          <h4 className="text-xs sm:text-sm font-bold text-green-700 dark:text-green-300 uppercase">Vista Previa del Pago</h4>
+                          <h4 className="text-xs sm:text-sm font-bold text-green-700 dark:text-green-300 uppercase">Payment Preview</h4>
                         </div>
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
                           <div>
-                            <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mb-1">Pagarás</p>
+                            <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mb-1">You will pay</p>
                             <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-700 dark:text-green-300 break-words">
                               {formatCurrency(parseFloat(paymentAmount))}
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mb-1">Deuda restante</p>
+                            <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mb-1">Remaining debt</p>
                             <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-700 dark:text-green-300 break-words">
                               {formatCurrency(remainingDebt)}
                             </p>
@@ -613,7 +613,7 @@ export function PublicPayment() {
                         </div>
                         <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-green-200 dark:border-green-700">
                           <div className="flex items-center justify-between text-xs sm:text-sm mb-2">
-                            <span className="text-green-700 dark:text-green-300 font-medium">Reducción de deuda</span>
+                            <span className="text-green-700 dark:text-green-300 font-medium">Debt reduction</span>
                             <span className="text-green-700 dark:text-green-300 font-bold">{percentagePaid}%</span>
                           </div>
                           <div className="w-full bg-green-200 dark:bg-green-900/50 rounded-full h-2 sm:h-3 overflow-hidden">
@@ -626,13 +626,13 @@ export function PublicPayment() {
                       </div>
                     )}
 
-                    {/* Referencia */}
+                    {/* Reference */}
                     <div>
-                      <Label required className="text-sm sm:text-base">Referencia / Concepto</Label>
+                      <Label required className="text-sm sm:text-base">Reference / Description</Label>
                       <div className="relative mt-2">
                         <Input
                           type="text"
-                          placeholder="Ej: Pago parcial abono 1"
+                          placeholder="Ex: Partial payment installment 1"
                           value={txReference}
                           onChange={handleReferenceChange}
                           onFocus={() => setFocusedField('reference')}
@@ -655,7 +655,7 @@ export function PublicPayment() {
                       )}
                     </div>
 
-                    {/* Wallet de destino */}
+                    {/* Destination wallet */}
                     <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-purple-200 dark:border-purple-700">
                       <div className="flex items-start gap-3 sm:gap-4">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
@@ -663,7 +663,7 @@ export function PublicPayment() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs sm:text-sm font-bold text-purple-700 dark:text-purple-300 mb-2">
-                            Wallet de Destino
+                            Destination Wallet
                           </p>
                           <div className="bg-white/50 dark:bg-black/20 rounded-lg p-2 sm:p-3 mb-2">
                             <code className="text-xs sm:text-sm font-mono text-purple-900 dark:text-purple-100 break-all block">
@@ -676,43 +676,43 @@ export function PublicPayment() {
                             className="text-xs sm:text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-semibold flex items-center gap-1 transition-colors"
                           >
                             <Copy size={14} className="flex-shrink-0" />
-                            <span>Copiar dirección</span>
+                            <span>Copy address</span>
                           </button>
                         </div>
                       </div>
                     </div>
 
-                    {/* Info importante */}
+                    {/* Important info */}
                     <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-200 dark:border-yellow-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
                       <div className="flex items-start gap-3 sm:gap-4">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 bg-yellow-100 dark:bg-yellow-900/50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
                           <Info className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-700 dark:text-yellow-400" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm sm:text-base font-bold text-yellow-900 dark:text-yellow-100 mb-2">Importante:</p>
+                          <p className="text-sm sm:text-base font-bold text-yellow-900 dark:text-yellow-100 mb-2">Important:</p>
                           <ul className="space-y-2 text-xs sm:text-sm text-yellow-800 dark:text-yellow-200">
                             <li className="flex items-start gap-2">
                               <span className="text-yellow-600 dark:text-yellow-400 mt-0.5 sm:mt-1 flex-shrink-0">•</span>
-                              <span>El pago será registrado en la blockchain Stellar</span>
+                              <span>Payment will be registered on the Stellar blockchain</span>
                             </li>
                             <li className="flex items-start gap-2">
                               <span className="text-yellow-600 dark:text-yellow-400 mt-0.5 sm:mt-1 flex-shrink-0">•</span>
-                              <span>Tu pago entrará en estado de <strong>revisión</strong></span>
+                              <span>Your payment will enter <strong>review</strong> status</span>
                             </li>
                             <li className="flex items-start gap-2">
                               <span className="text-yellow-600 dark:text-yellow-400 mt-0.5 sm:mt-1 flex-shrink-0">•</span>
-                              <span>El administrador lo verificará en 24-48 horas</span>
+                              <span>Administrator will verify it within 24-48 hours</span>
                             </li>
                             <li className="flex items-start gap-2">
                               <span className="text-yellow-600 dark:text-yellow-400 mt-0.5 sm:mt-1 flex-shrink-0">•</span>
-                              <span>Recibirás confirmación una vez aprobado</span>
+                              <span>You will receive confirmation once approved</span>
                             </li>
                           </ul>
                         </div>
                       </div>
                     </div>
 
-                    {/* Botón de pago */}
+                    {/* Payment button */}
                     <Button
                       type="submit"
                       variant="primary"
@@ -723,19 +723,19 @@ export function PublicPayment() {
                       {processing ? (
                         <>
                           <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
-                          <span className="text-base sm:text-lg">Procesando en Stellar...</span>
+                          <span className="text-base sm:text-lg">Processing on Stellar...</span>
                         </>
                       ) : (
                         <>
                           <ShieldCheck size={20} className="sm:w-6 sm:h-6" />
-                          <span className="text-base sm:text-lg font-bold">Pagar con Stellar</span>
+                          <span className="text-base sm:text-lg font-bold">Pay with Stellar</span>
                         </>
                       )}
                     </Button>
 
                     <p className="text-xs sm:text-sm text-center text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2">
                       <Lock size={14} className="sm:w-4 sm:h-4 flex-shrink-0" />
-                      <span>Transacción segura verificada por Stellar Blockchain</span>
+                      <span>Secure transaction verified by Stellar Blockchain</span>
                     </p>
                   </form>
                 </CardContent>

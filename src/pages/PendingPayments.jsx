@@ -27,12 +27,12 @@ export function PendingPayments() {
   const { confirm, ConfirmDialog } = useConfirm()
   const [processingPayments, setProcessingPayments] = useState(new Set())
 
-  // Recargar datos solo al entrar a la vista
+  // Reload data only when entering the view
   useEffect(() => {
     reloadData()
   }, [])
 
-  // Obtener todos los pagos pendientes de revisión
+  // Get all pending payments for review
   const pendingPayments = debtors
     .flatMap((debtor) =>
       debtor.payments
@@ -44,7 +44,7 @@ export function PendingPayments() {
     )
     .sort((a, b) => new Date(b.date) - new Date(a.date))
 
-  // Detectar pagos nuevos (últimos 5 minutos)
+  // Detect new payments (last 5 minutes)
   const isNewPayment = (paymentDate) => {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000)
     return new Date(paymentDate) > fiveMinutesAgo
@@ -69,10 +69,10 @@ export function PendingPayments() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
-    toast.success('Copiado al portapapeles')
+    toast.success('Copied to clipboard')
   }
 
-  // Efecto de confetti al aprobar pago
+  // Confetti effect when approving payment
   const celebrateApproval = () => {
     const duration = 3 * 1000
     const animationEnd = Date.now() + duration
@@ -91,7 +91,7 @@ export function PendingPayments() {
 
       const particleCount = 50 * (timeLeft / duration)
 
-      // Confetti desde la izquierda
+      // Confetti from the left
       confetti({
         ...defaults,
         particleCount,
@@ -99,7 +99,7 @@ export function PendingPayments() {
         colors: ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0']
       })
 
-      // Confetti desde la derecha
+      // Confetti from the right
       confetti({
         ...defaults,
         particleCount,
@@ -111,11 +111,11 @@ export function PendingPayments() {
 
   const handleApprove = async (debtorId, paymentId, amount) => {
     const confirmed = await confirm({
-      title: 'Aprobar pago',
-      message: `¿Confirmas que quieres aprobar este pago de ${formatCurrency(amount)}? El saldo del deudor se actualizará automáticamente.`,
+      title: 'Approve payment',
+      message: `Confirm that you want to approve this payment of ${formatCurrency(amount)}? The debtor's balance will be automatically updated.`,
       type: 'success',
-      confirmText: 'Aprobar',
-      cancelText: 'Cancelar'
+      confirmText: 'Approve',
+      cancelText: 'Cancel'
     })
 
     if (confirmed) {
@@ -125,13 +125,13 @@ export function PendingPayments() {
         await toast.promise(
           approvePayment(debtorId, paymentId),
           {
-            loading: 'Aprobando pago y actualizando deuda...',
-            success: '¡Pago aprobado! La deuda ha sido actualizada correctamente.',
-            error: (err) => `Error: ${err.message || 'Error al aprobar el pago'}`
+            loading: 'Approving payment and updating debt...',
+            success: 'Payment approved! The debt has been updated correctly.',
+            error: (err) => `Error: ${err.message || 'Error approving payment'}`
           }
         )
 
-        // Celebración con confetti al aprobar exitosamente
+        // Celebration with confetti when successfully approved
         celebrateApproval()
       } catch (error) {
         console.error('Error approving payment:', error)
@@ -147,11 +147,11 @@ export function PendingPayments() {
 
   const handleReject = async (debtorId, paymentId) => {
     const confirmed = await confirm({
-      title: 'Rechazar pago',
-      message: '¿Estás seguro de rechazar este pago? Esta acción no se puede deshacer.',
+      title: 'Reject payment',
+      message: 'Are you sure you want to reject this payment? This action cannot be undone.',
       type: 'danger',
-      confirmText: 'Rechazar',
-      cancelText: 'Cancelar'
+      confirmText: 'Reject',
+      cancelText: 'Cancel'
     })
 
     if (confirmed) {
@@ -161,9 +161,9 @@ export function PendingPayments() {
         await toast.promise(
           rejectPayment(debtorId, paymentId),
           {
-            loading: 'Rechazando pago...',
-            success: 'Pago rechazado exitosamente',
-            error: (err) => `Error: ${err.message || 'Error al rechazar el pago'}`
+            loading: 'Rejecting payment...',
+            success: 'Payment rejected successfully',
+            error: (err) => `Error: ${err.message || 'Error rejecting payment'}`
           }
         )
       } catch (error) {
@@ -178,7 +178,7 @@ export function PendingPayments() {
     }
   }
 
-  // Calcular estadísticas en tiempo real
+  // Calculate real-time statistics
   const totalPendingAmount = pendingPayments.reduce((sum, p) => sum + p.amount, 0)
   const newPaymentsCount = pendingPayments.filter(p => isNewPayment(p.date)).length
 
@@ -194,22 +194,22 @@ export function PendingPayments() {
           </div>
           <div className="min-w-0 flex-1">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-              Pagos Pendientes de Revisión
+              Pending Payments for Review
             </h1>
             <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm">
-              Gestiona y aprueba pagos de forma rápida y segura
+              Manage and approve payments quickly and securely
             </p>
           </div>
         </div>
 
-        {/* Stats Cards - Innovación: Dashboard en tiempo real */}
+        {/* Stats Cards - Innovation: Real-time Dashboard */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-6">
           <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-700">
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
                   <p className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">
-                    Pagos Pendientes
+                    Pending Payments
                   </p>
                   <p className="text-2xl sm:text-3xl font-bold text-blue-900 dark:text-blue-100">
                     {pendingPayments.length}
@@ -227,7 +227,7 @@ export function PendingPayments() {
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
                   <p className="text-xs sm:text-sm font-medium text-green-700 dark:text-green-300 mb-1">
-                    Monto Total
+                    Total Amount
                   </p>
                   <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-900 dark:text-green-100 break-words">
                     {formatCurrency(totalPendingAmount)}
@@ -245,12 +245,12 @@ export function PendingPayments() {
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
                   <p className="text-xs sm:text-sm font-medium text-purple-700 dark:text-purple-300 mb-1">
-                    Pagos Nuevos
+                    New Payments
                   </p>
                   <p className="text-2xl sm:text-3xl font-bold text-purple-900 dark:text-purple-100">
                     {newPaymentsCount}
                   </p>
-                  <p className="text-xs text-purple-600 dark:text-purple-400">últimos 5 min</p>
+                  <p className="text-xs text-purple-600 dark:text-purple-400">last 5 min</p>
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-200 dark:bg-purple-800 rounded-full flex items-center justify-center flex-shrink-0">
                   <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-purple-700 dark:text-purple-300 animate-pulse" />
@@ -268,10 +268,10 @@ export function PendingPayments() {
             <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
               <p className="text-xs sm:text-sm font-semibold text-orange-900 dark:text-orange-100 mb-1">
-                Tienes {pendingPayments.length} pago{pendingPayments.length !== 1 ? 's' : ''} pendiente{pendingPayments.length !== 1 ? 's' : ''} de revisión
+                You have {pendingPayments.length} payment{pendingPayments.length !== 1 ? 's' : ''} pending review
               </p>
               <p className="text-xs text-orange-700 dark:text-orange-300">
-                Revisa la información y aprueba o rechaza cada pago para actualizar los saldos
+                Review the information and approve or reject each payment to update balances
               </p>
             </div>
           </div>
@@ -286,10 +286,10 @@ export function PendingPayments() {
               <Clock className="w-7 h-7 sm:w-8 sm:h-8 text-gray-400 dark:text-gray-500" />
             </div>
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              No hay pagos pendientes
+              No pending payments
             </h3>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
-              Todos los pagos han sido revisados
+              All payments have been reviewed
             </p>
           </CardContent>
         </Card>
@@ -323,10 +323,10 @@ export function PendingPayments() {
                           </div>
                         </div>
                         <div className="flex gap-2 flex-shrink-0">
-                          <Badge variant="warning" className="text-xs">En Revisión</Badge>
+                          <Badge variant="warning" className="text-xs">Under Review</Badge>
                           {isNew && (
                             <Badge variant="success" className="animate-bounce text-xs">
-                              ¡Nuevo!
+                              New!
                             </Badge>
                           )}
                         </div>
@@ -337,7 +337,7 @@ export function PendingPayments() {
                           <div className="flex items-center gap-2 mb-1">
                             <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
                             <p className="text-xs text-green-700 dark:text-green-300 font-medium">
-                              Monto del Pago
+                              Payment Amount
                             </p>
                           </div>
                           <p className="text-xl sm:text-2xl font-bold text-green-700 dark:text-green-300 break-words">
@@ -349,7 +349,7 @@ export function PendingPayments() {
                           <div className="flex items-center gap-2 mb-1">
                             <Calendar className="w-4 h-4 text-gray-600 dark:text-gray-400 flex-shrink-0" />
                             <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
-                              Fecha de Pago
+                              Payment Date
                             </p>
                           </div>
                           <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white break-words">
@@ -379,7 +379,7 @@ export function PendingPayments() {
                         {payment.reference && (
                           <div>
                             <p className="text-xs text-blue-700 dark:text-blue-300 font-medium mb-1">
-                              Referencia / Concepto
+                              Reference / Concept
                             </p>
                             <p className="text-xs sm:text-sm text-blue-900 dark:text-blue-100 font-medium break-words">
                               {payment.reference}
@@ -390,20 +390,20 @@ export function PendingPayments() {
                         {payment.publicPayment && (
                           <div className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300 pt-2 border-t border-blue-200 dark:border-blue-700">
                             <Activity size={14} className="flex-shrink-0" />
-                            <span>Pago realizado desde portal público</span>
+                            <span>Payment made from public portal</span>
                           </div>
                         )}
                       </div>
 
-                      {/* Innovación: Visualización de impacto del pago */}
+                      {/* Innovation: Payment impact visualization */}
                       <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
                         <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 sm:mb-3 flex items-center gap-2">
                           <TrendingUp size={14} className="flex-shrink-0" />
-                          <span>IMPACTO DEL PAGO</span>
+                          <span>PAYMENT IMPACT</span>
                         </p>
                         <div className="space-y-2">
                           <div className="flex items-center justify-between text-xs sm:text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">Deuda actual:</span>
+                            <span className="text-gray-600 dark:text-gray-400">Current debt:</span>
                             <span className="font-bold text-red-600 dark:text-red-400 break-words">
                               {formatCurrency(payment.debtor.totalDebt)}
                             </span>
@@ -412,7 +412,7 @@ export function PendingPayments() {
                             <div className="flex mb-2 items-center justify-between gap-2">
                               <div>
                                 <span className="text-xs font-semibold text-green-600 dark:text-green-400">
-                                  Después del pago:
+                                  After payment:
                                 </span>
                               </div>
                               <div className="text-right">
@@ -428,7 +428,7 @@ export function PendingPayments() {
                               ></div>
                             </div>
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                              Reducción del {Math.min(100, ((payment.amount / payment.debtor.totalDebt) * 100).toFixed(1))}% de la deuda
+                              Reduction of {Math.min(100, ((payment.amount / payment.debtor.totalDebt) * 100).toFixed(1))}% of debt
                             </p>
                           </div>
                         </div>
@@ -445,7 +445,7 @@ export function PendingPayments() {
                         disabled={isProcessing}
                       >
                         <Check size={18} className="sm:w-5 sm:h-5" />
-                        <span className="text-sm sm:text-base">Aprobar</span>
+                        <span className="text-sm sm:text-base">Approve</span>
                       </Button>
                       <Button
                         variant="danger"
@@ -455,7 +455,7 @@ export function PendingPayments() {
                         disabled={isProcessing}
                       >
                         <X size={18} className="sm:w-5 sm:h-5" />
-                        <span className="text-sm sm:text-base">Rechazar</span>
+                        <span className="text-sm sm:text-base">Reject</span>
                       </Button>
                     </div>
                   </div>

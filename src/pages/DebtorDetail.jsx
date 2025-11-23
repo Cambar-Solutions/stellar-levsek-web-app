@@ -45,13 +45,13 @@ export function DebtorDetail() {
     return (
       <Layout>
         <div className="text-center py-12">
-          <p className="text-gray-600 dark:text-gray-300">Deudor no encontrado</p>
+          <p className="text-gray-600 dark:text-gray-300">Debtor not found</p>
           <Button
             variant="primary"
             onClick={() => navigate('/dashboard')}
             className="mt-4"
           >
-            Volver al Dashboard
+            Back to Dashboard
           </Button>
         </div>
       </Layout>
@@ -75,7 +75,7 @@ export function DebtorDetail() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
-    toast.success('Copiado al portapapeles')
+    toast.success('Copied to clipboard')
   }
 
   const handleAddPayment = (e) => {
@@ -83,7 +83,7 @@ export function DebtorDetail() {
     const amount = parseFloat(paymentAmount)
 
     if (!amount || amount <= 0) {
-      toast.error('Ingresa un monto válido')
+      toast.error('Enter a valid amount')
       return
     }
 
@@ -97,11 +97,11 @@ export function DebtorDetail() {
 
   const handleApprovePayment = async (paymentId, amount) => {
     const confirmed = await confirm({
-      title: 'Aprobar pago',
-      message: `¿Confirmas que quieres aprobar este pago de ${formatCurrency(amount)}?`,
+      title: 'Approve payment',
+      message: `Confirm that you want to approve this payment of ${formatCurrency(amount)}?`,
       type: 'success',
-      confirmText: 'Aprobar',
-      cancelText: 'Cancelar'
+      confirmText: 'Approve',
+      cancelText: 'Cancel'
     })
 
     if (confirmed) {
@@ -111,11 +111,11 @@ export function DebtorDetail() {
 
   const handleRejectPayment = async (paymentId) => {
     const confirmed = await confirm({
-      title: 'Rechazar pago',
-      message: '¿Estás seguro de rechazar este pago? Esta acción no se puede deshacer.',
+      title: 'Reject payment',
+      message: 'Are you sure you want to reject this payment? This action cannot be undone.',
       type: 'danger',
-      confirmText: 'Rechazar',
-      cancelText: 'Cancelar'
+      confirmText: 'Reject',
+      cancelText: 'Cancel'
     })
 
     if (confirmed) {
@@ -138,7 +138,7 @@ export function DebtorDetail() {
           className="mb-6 flex items-center gap-2"
         >
           <ArrowLeft size={18} />
-          Volver al Dashboard
+          Back to Dashboard
         </Button>
 
         {/* Debtor Info Card */}
@@ -155,13 +155,13 @@ export function DebtorDetail() {
                     variant={debtor.status === 'verified' ? 'verified' : 'pending'}
                     className="mt-2"
                   >
-                    {debtor.status === 'verified' ? 'Verificado' : 'Pendiente'}
+                    {debtor.status === 'verified' ? 'Verified' : 'Pending'}
                   </Badge>
                 </div>
               </div>
 
               <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-6 text-white min-w-[250px]">
-                <p className="text-sm text-blue-100 mb-1">Saldo Pendiente</p>
+                <p className="text-sm text-blue-100 mb-1">Outstanding Balance</p>
                 <p className="text-3xl font-bold">{formatCurrency(debtor.totalDebt)}</p>
               </div>
             </div>
@@ -170,8 +170,8 @@ export function DebtorDetail() {
               <InfoItem icon={<Mail size={18} />} label="Email" value={debtor.email} />
               <InfoItem
                 icon={<Phone size={18} />}
-                label="Teléfono"
-                value={debtor.phone || 'No registrado'}
+                label="Phone"
+                value={debtor.phone || 'Not registered'}
               />
               <InfoItem
                 icon={<Wallet size={18} />}
@@ -188,7 +188,7 @@ export function DebtorDetail() {
         <div className="grid md:grid-cols-3 gap-6 mb-6">
           <Card>
             <CardContent className="p-6 text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Total Pagado</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Total Paid</p>
               <p className="text-2xl font-bold text-green-600">
                 {formatCurrency(totalPaid)}
               </p>
@@ -196,7 +196,7 @@ export function DebtorDetail() {
           </Card>
           <Card>
             <CardContent className="p-6 text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Pagos Registrados</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Registered Payments</p>
               <p className="text-2xl font-bold text-blue-600">
                 {debtor.payments.length}
               </p>
@@ -204,7 +204,7 @@ export function DebtorDetail() {
           </Card>
           <Card>
             <CardContent className="p-6 text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Cuenta desde</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Account since</p>
               <p className="text-lg font-semibold text-gray-900 dark:text-white">
                 {formatDate(debtor.createdAt)}
               </p>
@@ -222,7 +222,7 @@ export function DebtorDetail() {
               className="w-full"
             >
               <DollarSign size={20} />
-              Registrar Pago Tradicional
+              Register Traditional Payment
             </Button>
             <Button
               variant="success"
@@ -231,7 +231,7 @@ export function DebtorDetail() {
               className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
             >
               <Zap size={20} />
-              Swap + Pay (Cualquier Token)
+              Swap + Pay (Any Token)
             </Button>
           </div>
         )}
@@ -240,12 +240,12 @@ export function DebtorDetail() {
         {showPaymentForm && (
           <Card className="mb-6">
             <CardHeader>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Registrar Nuevo Pago</h3>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Register New Payment</h3>
             </CardHeader>
             <CardContent className="p-6">
               <form onSubmit={handleAddPayment} className="space-y-4">
                 <div>
-                  <Label required>Monto del pago (MXN)</Label>
+                  <Label required>Payment amount (MXN)</Label>
                   <Input
                     type="number"
                     placeholder="1000.00"
@@ -257,7 +257,7 @@ export function DebtorDetail() {
                     onChange={(e) => setPaymentAmount(e.target.value)}
                   />
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Máximo: {formatCurrency(debtor.totalDebt)}
+                    Maximum: {formatCurrency(debtor.totalDebt)}
                   </p>
                 </div>
                 <div className="flex gap-3">
@@ -267,10 +267,10 @@ export function DebtorDetail() {
                     onClick={() => setShowPaymentForm(false)}
                     className="flex-1"
                   >
-                    Cancelar
+                    Cancel
                   </Button>
                   <Button type="submit" variant="primary" className="flex-1">
-                    Confirmar Pago
+                    Confirm Payment
                   </Button>
                 </div>
               </form>
@@ -282,9 +282,9 @@ export function DebtorDetail() {
         {debtor.debts && debtor.debts.length > 0 && (
           <Card className="mb-6">
             <CardHeader>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Desglose de Deudas</h3>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Debt Breakdown</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                {debtor.debts.length} {debtor.debts.length === 1 ? 'deuda registrada' : 'deudas registradas'}
+                {debtor.debts.length} {debtor.debts.length === 1 ? 'registered debt' : 'registered debts'}
               </p>
             </CardHeader>
             <CardContent className="p-0">
@@ -298,7 +298,7 @@ export function DebtorDetail() {
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h4 className="font-semibold text-gray-900 dark:text-white">
-                            {debt.description || 'Sin descripción'}
+                            {debt.description || 'No description'}
                           </h4>
                           <Badge
                             variant={
@@ -312,33 +312,33 @@ export function DebtorDetail() {
                             }
                           >
                             {debt.status === 'paid'
-                              ? 'Pagada'
+                              ? 'Paid'
                               : debt.status === 'partial'
-                              ? 'Parcial'
+                              ? 'Partial'
                               : debt.status === 'pending'
-                              ? 'Pendiente'
+                              ? 'Pending'
                               : debt.status}
                           </Badge>
                         </div>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                          Registrada el {formatDate(debt.createdAt)}
+                          Registered on {formatDate(debt.createdAt)}
                         </p>
 
                         <div className="grid grid-cols-3 gap-4 mt-3">
                           <div className="bg-blue-50 rounded-lg p-3">
-                            <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Monto Total</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Total Amount</p>
                             <p className="text-lg font-bold text-blue-600">
                               {formatCurrency(debt.totalAmount)}
                             </p>
                           </div>
                           <div className="bg-green-50 rounded-lg p-3">
-                            <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Pagado</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Paid</p>
                             <p className="text-lg font-bold text-green-600">
                               {formatCurrency(debt.paidAmount)}
                             </p>
                           </div>
                           <div className="bg-orange-50 rounded-lg p-3">
-                            <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Pendiente</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Pending</p>
                             <p className="text-lg font-bold text-orange-600">
                               {formatCurrency(debt.pendingAmount)}
                             </p>
@@ -370,12 +370,12 @@ export function DebtorDetail() {
         {/* Payment History */}
         <Card>
           <CardHeader>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Historial de Pagos</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Payment History</h3>
           </CardHeader>
           <CardContent className="p-0">
             {debtor.payments.length === 0 ? (
               <div className="p-12 text-center text-gray-500 dark:text-gray-400">
-                No hay pagos registrados
+                No registered payments
               </div>
             ) : (
               <div className="divide-y divide-gray-200">
@@ -423,10 +423,10 @@ export function DebtorDetail() {
                           }
                         >
                           {payment.status === 'verified'
-                            ? 'Verificado'
+                            ? 'Verified'
                             : payment.status === 'reviewing'
-                            ? 'En Revisión'
-                            : 'Pendiente'}
+                            ? 'Under Review'
+                            : 'Pending'}
                         </Badge>
                         <div className="flex items-center gap-2 mt-2">
                           <code className="text-xs text-gray-500 dark:text-gray-400 font-mono">
@@ -442,7 +442,7 @@ export function DebtorDetail() {
                       </div>
                     </div>
 
-                    {/* Botones de aprobación/rechazo para pagos en revisión */}
+                    {/* Approval/rejection buttons for payments under review */}
                     {payment.status === 'reviewing' && (
                       <div className="flex gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                         <Button
@@ -452,7 +452,7 @@ export function DebtorDetail() {
                           className="flex-1 flex items-center justify-center gap-2"
                         >
                           <Check size={16} />
-                          Aprobar Pago
+                          Approve Payment
                         </Button>
                         <Button
                           variant="danger"
@@ -461,7 +461,7 @@ export function DebtorDetail() {
                           className="flex-1 flex items-center justify-center gap-2"
                         >
                           <X size={16} />
-                          Rechazar
+                          Reject
                         </Button>
                       </div>
                     )}

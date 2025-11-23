@@ -29,22 +29,22 @@ export function Layout({ children }) {
     navigate('/login')
   }
 
-  // Contar pagos pendientes
+  // Count pending payments
   const pendingPaymentsCount = debtors.reduce((count, debtor) => {
     return count + debtor.payments.filter((p) => p.status === 'reviewing').length
   }, 0)
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Deudores', href: '/debtors', icon: Users },
+    { name: 'Debtors', href: '/debtors', icon: Users },
     {
-      name: 'Pagos Pendientes',
+      name: 'Pending Payments',
       href: '/pending-payments',
       icon: Clock,
       badge: pendingPaymentsCount > 0 ? pendingPaymentsCount : null
     },
-    { name: 'Estadísticas', href: '/stats', icon: BarChart3 },
-    { name: 'Vista Pública', href: `/public/${user?.siteId}`, icon: Globe },
+    { name: 'Statistics', href: '/stats', icon: BarChart3 },
+    { name: 'Public View', href: `/public/${user?.siteId}`, icon: Globe },
   ]
 
   return (
@@ -151,7 +151,7 @@ export function Layout({ children }) {
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
               >
                 <LogOut size={18} />
-                Cerrar Sesión
+                Sign Out
               </button>
             </div>
           </div>
@@ -169,7 +169,7 @@ export function Layout({ children }) {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              Sistema en línea • Datos actualizados en tiempo real
+              Online System • Real-time data updates
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
               <ShieldCheck className="w-4 h-4" />

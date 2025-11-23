@@ -57,37 +57,37 @@ export function Stats() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Estadísticas Avanzadas
+          Advanced Statistics
         </h1>
         <p className="text-gray-600 dark:text-gray-300">
-          Análisis detallado de las cuentas por cobrar de {user?.businessName}
+          Detailed analysis of accounts receivable for {user?.businessName}
         </p>
       </div>
 
       {/* Main Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatsCard
-          title="Deuda Total"
+          title="Total Debt"
           value={formatCurrency(stats.totalDebt)}
           icon={<DollarSign className="w-6 h-6" />}
           color="red"
           trend={-12}
         />
         <StatsCard
-          title="Total Cobrado"
+          title="Total Collected"
           value={formatCurrency(totalPaid)}
           icon={<TrendingUp className="w-6 h-6" />}
           color="green"
           trend={+23}
         />
         <StatsCard
-          title="Total Deudores"
+          title="Total Debtors"
           value={stats.totalDebtors}
           icon={<Users className="w-6 h-6" />}
           color="blue"
         />
         <StatsCard
-          title="Promedio/Deudor"
+          title="Average/Debtor"
           value={formatCurrency(averageDebt)}
           icon={<Activity className="w-6 h-6" />}
           color="purple"
@@ -98,20 +98,20 @@ export function Stats() {
       <div className="grid md:grid-cols-2 gap-6 mb-8">
         <Card>
           <CardHeader>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Estado de Cuentas</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Account Status</h3>
           </CardHeader>
           <CardContent className="p-6">
             <div className="space-y-4">
               <StatusItem
                 icon={<Clock className="w-5 h-5 text-orange-600" />}
-                label="Cuentas Pendientes"
+                label="Pending Accounts"
                 value={stats.pendingCount}
                 percentage={(stats.pendingCount / stats.totalDebtors) * 100}
                 color="orange"
               />
               <StatusItem
                 icon={<CheckCircle2 className="w-5 h-5 text-green-600" />}
-                label="Cuentas Verificadas"
+                label="Verified Accounts"
                 value={stats.verifiedCount}
                 percentage={(stats.verifiedCount / stats.totalDebtors) * 100}
                 color="green"
@@ -123,7 +123,7 @@ export function Stats() {
         <Card>
           <CardHeader>
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-              Distribución de Deuda
+              Debt Distribution
             </h3>
           </CardHeader>
           <CardContent className="p-6">
@@ -147,7 +147,7 @@ export function Stats() {
                 }
               />
               <DebtRangeItem
-                range="Más de $5,000"
+                range="More than $5,000"
                 count={debtors.filter((d) => d.totalDebt > 5000).length}
               />
             </div>
@@ -159,7 +159,7 @@ export function Stats() {
       <Card className="mb-8">
         <CardHeader>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-            Top 5 Deudores (Mayor Saldo)
+            Top 5 Debtors (Highest Balance)
           </h3>
         </CardHeader>
         <CardContent className="p-0">
@@ -185,7 +185,7 @@ export function Stats() {
                     {formatCurrency(debtor.totalDebt)}
                   </p>
                   <Badge variant={debtor.status === 'verified' ? 'verified' : 'pending'}>
-                    {debtor.status === 'verified' ? 'Verificado' : 'Pendiente'}
+                    {debtor.status === 'verified' ? 'Verified' : 'Pending'}
                   </Badge>
                 </div>
               </div>
@@ -198,13 +198,13 @@ export function Stats() {
       <Card>
         <CardHeader>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-            Pagos Recientes
+            Recent Payments
           </h3>
         </CardHeader>
         <CardContent className="p-0">
           {recentPayments.length === 0 ? (
             <div className="p-12 text-center text-gray-500 dark:text-gray-400">
-              No hay pagos registrados
+              No payments registered
             </div>
           ) : (
             <div className="divide-y divide-gray-200">
@@ -283,7 +283,7 @@ function StatsCard({ title, value, icon, color, trend }) {
                 <span className="text-red-600 font-semibold">{trend}%</span>
               </>
             )}
-            <span className="text-gray-500 dark:text-gray-400 ml-1">vs mes anterior</span>
+            <span className="text-gray-500 dark:text-gray-400 ml-1">vs previous month</span>
           </div>
         )}
       </CardContent>
@@ -315,7 +315,7 @@ function DebtRangeItem({ range, count }) {
   return (
     <div className="flex items-center justify-between py-2">
       <span className="text-sm text-gray-700 dark:text-gray-200">{range}</span>
-      <Badge variant="default">{count} deudores</Badge>
+      <Badge variant="default">{count} debtors</Badge>
     </div>
   )
 }

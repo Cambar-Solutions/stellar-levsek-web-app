@@ -44,7 +44,7 @@ export function Dashboard() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
-    toast.success('Copiado al portapapeles')
+    toast.success('Copied to clipboard')
   }
 
   return (
@@ -52,35 +52,35 @@ export function Dashboard() {
       {/* Welcome Section */}
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Bienvenido, {user?.name}
+          Welcome, {user?.name}
         </h1>
         <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
-          Gestiona las deudas de {user?.businessName} de forma transparente
+          Manage debts for {user?.businessName} transparently
         </p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <StatsCard
-          title="Total Deudores"
+          title="Total Debtors"
           value={stats.totalDebtors}
           icon={<Users className="w-5 h-5 sm:w-6 sm:h-6" />}
           color="blue"
         />
         <StatsCard
-          title="Deuda Total"
+          title="Total Debt"
           value={formatCurrency(stats.totalDebt)}
           icon={<DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />}
           color="purple"
         />
         <StatsCard
-          title="Pendientes"
+          title="Pending"
           value={stats.pendingCount}
           icon={<Clock className="w-5 h-5 sm:w-6 sm:h-6" />}
           color="orange"
         />
         <StatsCard
-          title="Verificados"
+          title="Verified"
           value={stats.verifiedCount}
           icon={<CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" />}
           color="green"
@@ -98,7 +98,7 @@ export function Dashboard() {
           <div className="flex flex-col gap-4">
             <div className="text-white">
               <p className="text-sm font-medium text-blue-100 mb-2">
-                Tu Wallet Stellar
+                Your Stellar Wallet
               </p>
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg p-3">
                 <code className="text-xs sm:text-sm font-mono font-semibold flex-1 break-all">
@@ -107,7 +107,7 @@ export function Dashboard() {
                 <button
                   onClick={() => copyToClipboard(user?.walletAddress)}
                   className="p-2 hover:bg-white/20 rounded-lg transition-colors flex-shrink-0"
-                  title="Copiar dirección"
+                  title="Copy address"
                 >
                   <Copy size={18} />
                 </button>
@@ -126,7 +126,7 @@ export function Dashboard() {
               <Link to={`/public/${user?.siteId}`} className="w-full sm:w-auto">
                 <Button variant="secondary" size="sm" className="flex items-center justify-center gap-2 w-full">
                   <ExternalLink size={16} />
-                  <span className="sm:inline">Vista Pública</span>
+                  <span className="sm:inline">Public View</span>
                 </Button>
               </Link>
             </div>
@@ -140,7 +140,7 @@ export function Dashboard() {
           <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
             <div className="flex-1">
               <Input
-                placeholder="Busca por nombre completo para gestionar tu registro"
+                placeholder="Search by full name to manage your record"
                 icon={Search}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -149,7 +149,7 @@ export function Dashboard() {
             <Link to="/debtors/add">
               <Button variant="primary" className="flex items-center gap-2 w-full md:w-auto">
                 <Plus size={18} />
-                Registrar Deudor
+                Register Debtor
               </Button>
             </Link>
           </div>
@@ -160,8 +160,8 @@ export function Dashboard() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Control de Deudas</h2>
-            <Badge variant="primary" className="text-xs sm:text-sm flex-shrink-0">{filteredDebtors.length} registros</Badge>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Debt Control</h2>
+            <Badge variant="primary" className="text-xs sm:text-sm flex-shrink-0">{filteredDebtors.length} records</Badge>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -171,19 +171,19 @@ export function Dashboard() {
               <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Cliente
+                    Client
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Cuenta
+                    Account
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Saldo Pendiente
+                    Outstanding Balance
                   </th>
                   <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Estado
+                    Status
                   </th>
                   <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                    Acción
+                    Action
                   </th>
                 </tr>
               </thead>
@@ -191,7 +191,7 @@ export function Dashboard() {
                 {filteredDebtors.length === 0 ? (
                   <tr>
                     <td colSpan="5" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                      No se encontraron deudores
+                      No debtors found
                     </td>
                   </tr>
                 ) : (
@@ -237,7 +237,7 @@ export function Dashboard() {
                               : 'default'
                           }
                         >
-                          {debtor.status === 'verified' ? 'Verificado' : 'Pendiente'}
+                          {debtor.status === 'verified' ? 'Verified' : 'Pending'}
                         </Badge>
                       </td>
                       <td className="px-6 py-4 text-center">
@@ -248,7 +248,7 @@ export function Dashboard() {
                             className="flex items-center gap-2 mx-auto"
                           >
                             <TrendingUp size={16} />
-                            Ver Detalle
+                            View Details
                           </Button>
                         </Link>
                       </td>
@@ -290,20 +290,20 @@ export function Dashboard() {
                       }
                       className="text-xs flex-shrink-0"
                     >
-                      {debtor.status === 'verified' ? 'Verificado' : 'Pendiente'}
+                      {debtor.status === 'verified' ? 'Verified' : 'Pending'}
                     </Badge>
                   </div>
 
                   {/* Info */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-center gap-2">
-                      <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Tipo de Cuenta</span>
+                      <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Account Type</span>
                       <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white break-words text-right">
                         {debtor.accountType}
                       </span>
                     </div>
                     <div className="flex justify-between items-center gap-2">
-                      <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Saldo Pendiente</span>
+                      <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Outstanding Balance</span>
                       <span
                         className={`font-bold text-base sm:text-lg break-words ${
                           debtor.totalDebt > 4000
@@ -326,7 +326,7 @@ export function Dashboard() {
                       className="w-full flex items-center justify-center gap-2"
                     >
                       <TrendingUp size={16} />
-                      <span className="text-sm">Ver Detalle</span>
+                      <span className="text-sm">View Details</span>
                     </Button>
                   </Link>
                 </div>
